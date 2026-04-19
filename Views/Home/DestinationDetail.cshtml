@@ -1,0 +1,100 @@
+@model TravelProject.Models.Destination
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="hero-wrap hero-wrap-2 js-fullheight"
+         style="background-image: url('@(Model.ImageUrl ?? "/images/bg_1.jpg")');">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
+            <div class="col-md-9 ftco-animate pb-5 text-center">
+                <p class="breadcrumbs">
+                    <span class="mr-2"><a href="/">Home <i class="fa fa-chevron-right"></i></a></span>
+                    <span class="mr-2"><a href="/Home/Destinations">Destinations <i class="fa fa-chevron-right"></i></a></span>
+                    <span>@Model.Name</span>
+                </p>
+                <h1 class="mb-0 bread">@Model.Name</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ftco-section">
+    <div class="container">
+        <div class="row">
+
+            <!-- Cột trái -->
+            <div class="col-md-8">
+                <h2 class="mb-3">@Model.Name</h2>
+                <p class="text-muted">
+                    <span class="fa fa-map-marker mr-2"></span>@Model.Address
+                </p>
+                <p>
+                    <span class="badge badge-danger mr-2">@Model.Region</span>
+                    <span class="badge badge-secondary">@Model.Category</span>
+                </p>
+                <hr/>
+                <h5>About this destination</h5>
+                <p>@Model.Description</p>
+
+                <!-- Bản đồ -->
+                @if (Model.Latitude != null && Model.Longitude != null)
+                {
+                    <h5 class="mt-4">Location on Map</h5>
+                    <div class="ratio ratio-16x9 mb-4">
+                        <iframe
+                            src="https://www.google.com/maps?q=@Model.Latitude,@Model.Longitude&z=14&output=embed"
+                            width="100%" height="400"
+                            style="border:0; border-radius:8px;"
+                            allowfullscreen loading="lazy">
+                        </iframe>
+                    </div>
+                }
+            </div>
+
+            <!-- Cột phải -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">Quick Info</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <span class="fa fa-globe mr-2 text-primary"></span>
+                                <strong>Region:</strong> @Model.Region
+                            </li>
+                            <li class="mb-2">
+                                <span class="fa fa-tag mr-2 text-primary"></span>
+                                <strong>Category:</strong> @Model.Category
+                            </li>
+                            <li class="mb-2">
+                                <span class="fa fa-eye mr-2 text-primary"></span>
+                                <strong>Views:</strong> @Model.ViewCount
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Nút yêu thích -->
+                <a href="#" class="btn btn-outline-danger btn-block mb-3">
+                    <span class="fa fa-heart mr-2"></span>Add to Favorites
+                </a>
+
+                <!-- Nút xem tour -->
+                <a href="/Home/Destinations" class="btn btn-primary btn-block mb-3">
+                    <span class="fa fa-search mr-2"></span>Find Tours Here
+                </a>
+
+                <!-- Nút back -->
+                <a href="/Home/Destinations" class="btn btn-outline-secondary btn-block">
+                    <span class="fa fa-arrow-left mr-2"></span>Back to Destinations
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>

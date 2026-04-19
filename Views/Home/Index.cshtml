@@ -2,6 +2,7 @@
     Layout = null;
     ViewData["Title"] = "Home";
 }
+@model List<TravelProject.Models.Destination>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -297,16 +298,22 @@
 				<div class="row">
 					<div class="col-md-12">
 						<div class="carousel-destination owl-carousel ftco-animate">
-							<div class="item">
-								<div class="project-destination">
-									<a href="#" class="img" style="background-image: url(images/place-1.jpg);">
-										<div class="text">
-											<h3>Cao Bang province</h3>
-											<span>8 Tours</span>
-										</div>
-									</a>
+							@foreach (var item in Model)
+							{
+								<div class="item">
+									<div class="project-destination">
+										<a href="/Home/DestinationDetail/@item.DestinationID"
+										class="img"
+										style="background-image: url('@(item.ImageUrl ?? "images/place-1.jpg")');">
+											<div class="text">
+												<h3>@item.Name</h3>
+												<span>@item.Region</span>
+											</div>
+										</a>
+									</div>
 								</div>
-							</div>
+							}
+						</div>
 							<div class="item">
 								<div class="project-destination">
 									<a href="#" class="img" style="background-image: url(images/place-2.jpg);">

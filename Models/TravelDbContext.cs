@@ -12,6 +12,7 @@ namespace TravelProject.Models
             : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Destination> Destinations { get; set; }
     }
 
 }

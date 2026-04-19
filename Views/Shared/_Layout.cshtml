@@ -32,13 +32,35 @@
             </button>
 
             <div class="collapse navbar-collapse" id="ftco-nav">
-                <ul class="navbar-nav ml-auto">
+                < class="navbar-nav ml-auto">
                     <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
                     <li class="nav-item"><a href="/About" class="nav-link">About</a></li>
-                    <li class="nav-item"><a href="/Destination" class="nav-link">Destination</a></li>
+                    <li class="nav-item"><a href="/Destination/List" class="nav-link">Destination</a></li>
                     <li class="nav-item"><a href="/Hotel" class="nav-link">Hotel</a></li>
                     <li class="nav-item"><a href="/Blog" class="nav-link">Blog</a></li>
                     <li class="nav-item"><a href="/Contact" class="nav-link">Contact</a></li>
+                    @if (Context.Session.GetString("Username") != null)
+                        {
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <span class="fa fa-user mr-1"></span>
+                                    @Context.Session.GetString("Username")
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/Account/Logout" class="nav-link">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a href="/Account/Login" class="nav-link">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/Account/Register" class="nav-link">Register</a>
+                            </li>
+                        }
+
                 </ul>
             </div>
         </div>

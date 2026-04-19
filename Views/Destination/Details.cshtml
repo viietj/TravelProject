@@ -1,0 +1,99 @@
+@model TravelProject.Models.Destination
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container mt-5">
+    <div class="row">
+
+        <!-- Cột trái: Ảnh + thông tin chính -->
+        <div class="col-md-8">
+
+            <!-- Ảnh -->
+            @if (Model.ImageUrl != null)
+            {
+                <img src="@Model.ImageUrl"
+                     class="img-fluid rounded w-100 mb-4"
+                     style="height:400px; object-fit:cover;"
+                     alt="@Model.Name"
+                     onerror="this.src='/images/default.jpg'" />
+            }
+
+            <!-- Tên + badges -->
+            <div class="mb-3">
+                <span class="badge bg-danger me-2">@Model.Region</span>
+                <span class="badge bg-secondary">@Model.Category</span>
+            </div>
+            <h2>@Model.Name</h2>
+            <p class="text-muted">
+                <i class="fas fa-map-marker-alt me-1"></i>@Model.Address
+            </p>
+            <hr />
+
+            <!-- Mô tả -->
+            <h5>About this destination</h5>
+            <p>@Model.Description</p>
+
+            <!-- Bản đồ -->
+            @if (Model.Latitude != null && Model.Longitude != null)
+            {
+                <h5 class="mt-4">Location</h5>
+                <div class="ratio ratio-16x9 rounded overflow-hidden">
+                    <iframe
+                        src="https://www.google.com/maps?q=@Model.Latitude,@Model.Longitude&z=14&output=embed"
+                        allowfullscreen loading="lazy">
+                    </iframe>
+                </div>
+            }
+
+        </div>
+
+        <!-- Cột phải: Thông tin nhanh -->
+        <div class="col-md-4">
+
+            <!-- Info card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">Quick Info</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-globe me-2 text-danger"></i>
+                            <strong>Region:</strong> @Model.Region
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-tag me-2 text-danger"></i>
+                            <strong>Category:</strong> @Model.Category
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-eye me-2 text-danger"></i>
+                            <strong>Views:</strong> @Model.ViewCount
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar me-2 text-danger"></i>
+                            <strong>Added:</strong> @Model.CreatedDate.ToString("dd/MM/yyyy")
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Nút yêu thích -->
+            <div class="d-grid mb-3">
+                <a href="#" class="btn btn-outline-danger">
+                    <i class="fas fa-heart me-2"></i>Add to Favorites
+                </a>
+            </div>
+
+            <!-- Nút back -->
+            <div class="d-grid">
+                <a href="/Destination/List" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Destinations
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
