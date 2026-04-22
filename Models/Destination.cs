@@ -21,6 +21,6 @@ namespace TravelProject.Models
         public bool IsActive { get; set; } = true;
         public int? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public ICollection<DestinationComment>? DestinationComments { get; set; }
     }
 }
-    

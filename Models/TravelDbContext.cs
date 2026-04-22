@@ -13,6 +13,7 @@ namespace TravelProject.Models
 
         public DbSet<User> Users { get; set; }
         public DbSet<Destination> Destinations { get; set; }
+        public DbSet<DestinationComment> DestinationComments { get; set; }
     }
 
 }

@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\TravelProject\\TravelProject.csproj": {}
+    "C:\\Users\\nguye\\TravelProject\\TravelProject.csproj": {}
   },
   "projects": {
-    "D:\\TravelProject\\TravelProject.csproj": {
+    "C:\\Users\\nguye\\TravelProject\\TravelProject.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\TravelProject\\TravelProject.csproj",
+        "projectUniqueName": "C:\\Users\\nguye\\TravelProject\\TravelProject.csproj",
         "projectName": "TravelProject",
-        "projectPath": "D:\\TravelProject\\TravelProject.csproj",
-        "packagesPath": "C:\\Users\\Mr.Chien\\.nuget\\packages\\",
-        "outputPath": "D:\\TravelProject\\obj\\",
+        "projectPath": "C:\\Users\\nguye\\TravelProject\\TravelProject.csproj",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\nguye\\TravelProject\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Mr.Chien\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -44,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
@@ -84,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

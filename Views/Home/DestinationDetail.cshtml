@@ -1,12 +1,12 @@
-@model TravelProject.Models.Destination
+@model TravelProject.Models.ViewModels.DestinationDetailsViewModel
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"] = Model.Destination.Name;
 }
 
 <section class="hero-wrap hero-wrap-2 js-fullheight"
-         style="background-image: url('@(Model.ImageUrl ?? "/images/bg_1.jpg")');">
+         style="background-image: url('@(Model.Destination.ImageUrl ?? "/images/bg_1.jpg")');">
     <div class="overlay"></div>
     <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
@@ -14,9 +14,9 @@
                 <p class="breadcrumbs">
                     <span class="mr-2"><a href="/">Home <i class="fa fa-chevron-right"></i></a></span>
                     <span class="mr-2"><a href="/Home/Destinations">Destinations <i class="fa fa-chevron-right"></i></a></span>
-                    <span>@Model.Name</span>
+                    <span>@Model.Destination.Name</span>
                 </p>
-                <h1 class="mb-0 bread">@Model.Name</h1>
+                <h1 class="mb-0 bread">@Model.Destination.Name</h1>
             </div>
         </div>
     </div>
@@ -28,31 +28,116 @@
 
             <!-- Cột trái -->
             <div class="col-md-8">
-                <h2 class="mb-3">@Model.Name</h2>
+                <h2 class="mb-3">@Model.Destination.Name</h2>
                 <p class="text-muted">
-                    <span class="fa fa-map-marker mr-2"></span>@Model.Address
+                    <span class="fa fa-map-marker mr-2"></span>@Model.Destination.Address
                 </p>
                 <p>
-                    <span class="badge badge-danger mr-2">@Model.Region</span>
-                    <span class="badge badge-secondary">@Model.Category</span>
+                    <span class="badge badge-danger mr-2">@Model.Destination.Region</span>
+                    <span class="badge badge-secondary">@Model.Destination.Category</span>
+                    <span class="badge badge-warning text-dark mr-2">@Model.AverageRating.ToString("0.0")/5</span>
                 </p>
                 <hr/>
                 <h5>About this destination</h5>
-                <p>@Model.Description</p>
+                <p>@Model.Destination.Description</p>
 
                 <!-- Bản đồ -->
-                @if (Model.Latitude != null && Model.Longitude != null)
+                @if (Model.Destination.Latitude != null && Model.Destination.Longitude != null)
                 {
                     <h5 class="mt-4">Location on Map</h5>
                     <div class="ratio ratio-16x9 mb-4">
                         <iframe
-                            src="https://www.google.com/maps?q=@Model.Latitude,@Model.Longitude&z=14&output=embed"
+                            src="https://www.google.com/maps?q=@Model.Destination.Latitude,@Model.Destination.Longitude&z=14&output=embed"
                             width="100%" height="400"
                             style="border:0; border-radius:8px;"
                             allowfullscreen loading="lazy">
                         </iframe>
                     </div>
                 }
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">Write a Review</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (TempData["CommentSuccess"] != null)
+                        {
+                            <div class="alert alert-success">@TempData["CommentSuccess"]</div>
+                        }
+
+                        @if (TempData["CommentError"] != null)
+                        {
+                            <div class="alert alert-danger">@TempData["CommentError"]</div>
+                        }
+
+                        <form asp-action="AddDestinationComment" method="post">
+                            <input type="hidden" asp-for="Destination.DestinationID" />
+
+                            <div class="form-group">
+                                <label>Your name</label>
+                                <input asp-for="UserName" class="form-control" placeholder="Enter your name" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Your rating</label>
+                                <select asp-for="Rating" class="form-control">
+                                    <option value="5">5 stars - Excellent</option>
+                                    <option value="4">4 stars - Very good</option>
+                                    <option value="3">3 stars - Good</option>
+                                    <option value="2">2 stars - Fair</option>
+                                    <option value="1">1 star - Poor</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Your review</label>
+                                <textarea asp-for="Content" class="form-control" rows="4" placeholder="Share your experience about this destination"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <span class="fa fa-paper-plane mr-2"></span>Submit Review
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Visitor Reviews (@Model.TotalComments)</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Comments.Any())
+                        {
+                            @foreach (var comment in Model.Comments)
+                            {
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>@comment.UserName</strong>
+                                        <small class="text-muted">@comment.CreatedDate.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </div>
+                                    <div class="mb-2 text-warning">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= comment.Rating)
+                                            {
+                                                <span class="fa fa-star"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="fa fa-star-o"></span>
+                                            }
+                                        }
+                                    </div>
+                                    <p class="mb-0">@comment.Content</p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">No reviews yet. Be the first to review this destination.</p>
+                        }
+                    </div>
+                </div>
             </div>
 
             <!-- Cột phải -->
@@ -65,15 +150,23 @@
                         <ul class="list-unstyled mb-0">
                             <li class="mb-2">
                                 <span class="fa fa-globe mr-2 text-primary"></span>
-                                <strong>Region:</strong> @Model.Region
+                                <strong>Region:</strong> @Model.Destination.Region
                             </li>
                             <li class="mb-2">
                                 <span class="fa fa-tag mr-2 text-primary"></span>
-                                <strong>Category:</strong> @Model.Category
+                                <strong>Category:</strong> @Model.Destination.Category
                             </li>
                             <li class="mb-2">
                                 <span class="fa fa-eye mr-2 text-primary"></span>
-                                <strong>Views:</strong> @Model.ViewCount
+                                <strong>Views:</strong> @Model.Destination.ViewCount
+                            </li>
+                            <li class="mb-2">
+                                <span class="fa fa-star mr-2 text-primary"></span>
+                                <strong>Rating:</strong> @Model.AverageRating.ToString("0.0")/5
+                            </li>
+                            <li class="mb-2">
+                                <span class="fa fa-comments mr-2 text-primary"></span>
+                                <strong>Reviews:</strong> @Model.TotalComments
                             </li>
                         </ul>
                     </div>

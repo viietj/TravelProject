@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TravelProject.Models;
+using TravelProject.Models.ViewModels;
 
 namespace TravelProject.Controllers
 {
@@ -14,6 +16,11 @@ namespace TravelProject.Controllers
         public DestinationController(TravelDbContext db)
         {
             _db = db;
+        }
+
+        private bool IsAdmin()
+        {
+            return HttpContext.Session.GetString("Role") == "Admin";
         }
 
         // GET: /Destination
@@ -87,14 +94,107 @@ namespace TravelProject.Controllers
         // GET: /Destination/Details/5
         public IActionResult Details(int id)
         {
-            var destination = _db.Destinations.Find(id);
+            var destination = _db.Destinations.FirstOrDefault(d => d.DestinationID == id && d.IsActive);
             if (destination == null) return NotFound();
 
             // Tăng lượt xem
             destination.ViewCount++;
             _db.SaveChanges();
 
-            return View(destination);
+            var comments = _db.DestinationComments
+                .Where(c => c.DestinationID == id && c.IsActive && c.IsApproved)
+                .OrderByDescending(c => c.CreatedDate)
+                .ToList();
+
+            var vm = new DestinationDetailsViewModel
+            {
+                Destination = destination,
+                Comments = comments,
+                TotalComments = comments.Count,
+                AverageRating = comments.Count > 0 ? comments.Average(c => c.Rating) : 0
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        public IActionResult AddComment(DestinationDetailsViewModel model)
+        {
+            var destination = _db.Destinations.FirstOrDefault(d => d.DestinationID == model.Destination.DestinationID && d.IsActive);
+            if (destination == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(model.UserName) ||
+                string.IsNullOrWhiteSpace(model.Content) ||
+                model.Rating < 1 ||
+                model.Rating > 5)
+            {
+                TempData["CommentError"] = "Please enter your name, review content and choose a rating from 1 to 5 stars.";
+                return RedirectToAction("Details", new { id = model.Destination.DestinationID });
+            }
+
+            var comment = new DestinationComment
+            {
+                DestinationID = model.Destination.DestinationID,
+                UserName = model.UserName.Trim(),
+                Content = model.Content.Trim(),
+                Rating = model.Rating,
+                CreatedDate = DateTime.Now,
+                IsActive = true,
+                IsApproved = true
+            };
+
+            _db.DestinationComments.Add(comment);
+            _db.SaveChanges();
+
+            TempData["CommentSuccess"] = "Your review has been submitted successfully.";
+            return RedirectToAction("Details", new { id = model.Destination.DestinationID });
+        }
+
+        public IActionResult ManageComments()
+        {
+            if (!IsAdmin())
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var comments = _db.DestinationComments
+                .Include(c => c.Destination)
+                .OrderByDescending(c => c.CreatedDate)
+                .ToList();
+
+            return View(comments);
+        }
+
+        public IActionResult ToggleComment(int id)
+        {
+            if (!IsAdmin())
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var comment = _db.DestinationComments.Find(id);
+            if (comment == null) return NotFound();
+
+            comment.IsActive = !comment.IsActive;
+            _db.SaveChanges();
+
+            return RedirectToAction("ManageComments");
+        }
+
+        public IActionResult DeleteComment(int id)
+        {
+            if (!IsAdmin())
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var comment = _db.DestinationComments.Find(id);
+            if (comment == null) return NotFound();
+
+            comment.IsActive = false;
+            _db.SaveChanges();
+
+            return RedirectToAction("ManageComments");
         }
     }
 }

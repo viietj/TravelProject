@@ -1,0 +1,70 @@
+@model List<TravelProject.Models.DestinationComment>
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Manage Comments";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Comment Management</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Destination</th>
+                                <th>User</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th style="width:180px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Destination?.Name</td>
+                                    <td>@item.UserName</td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark">@item.Rating/5</span>
+                                    </td>
+                                    <td>@item.Content</td>
+                                    <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge bg-success">Visible</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Hidden</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="ToggleComment" asp-route-id="@item.DestinationCommentID" class="btn btn-sm btn-outline-primary me-1">
+                                            Toggle
+                                        </a>
+                                        <a asp-action="DeleteComment" asp-route-id="@item.DestinationCommentID" class="btn btn-sm btn-outline-danger">
+                                            Hide
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">There are no comments yet.</p>
+            }
+        </div>
+    </div>
+</div>
