@@ -1,0 +1,424 @@
+@model TravelProject.Models.Hotel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Name;
+}
+
+<style>
+    .hotel-details-wrapper {
+        padding: 40px 0 80px;
+        background-color: #f8fafc;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .breadcrumb-nav {
+        margin-bottom: 25px;
+    }
+    .breadcrumb-nav a {
+        color: #f15d30;
+        text-decoration: none;
+        font-weight: 550;
+        font-size: 0.9rem;
+    }
+    .breadcrumb-nav span {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .details-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.03);
+        border: 1px solid #edf2f7;
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .hotel-header {
+        border-bottom: 1.5px solid #f1f5f9;
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+    }
+    .hotel-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .hotel-title-group h1 {
+        font-size: 2.1rem;
+        font-weight: 850;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+    }
+    .hotel-type-badge-detail {
+        background: #f15d30;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        vertical-align: middle;
+        margin-left: 10px;
+        display: inline-block;
+    }
+    .hotel-stars {
+        color: #fbbf24;
+        font-size: 1.15rem;
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+    }
+    .hotel-address {
+        color: #64748b;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .hotel-address i { color: #ef4444; }
+
+    .hotel-hero-img-box {
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        height: 480px;
+    }
+    .hotel-hero-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .info-section-title {
+        font-size: 1.25rem;
+        font-weight: 750;
+        color: #1a1a2e;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .info-section-title i { color: #f15d30; }
+
+    .description-text {
+        color: #4a5568;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        margin-bottom: 30px;
+    }
+
+    .amenities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 35px;
+    }
+    .amenity-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #334155;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.2s;
+    }
+    .amenity-item:hover { background: #f1f5f9; }
+    .amenity-item i { color: #10b981; font-size: 1.1rem; }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 15px;
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #edf2f7;
+        margin-bottom: 30px;
+    }
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.9rem;
+        color: #334155;
+    }
+    .contact-item i {
+        font-size: 1.2rem;
+        color: #f15d30;
+        width: 24px;
+        text-align: center;
+    }
+    .contact-item a {
+        color: #334155;
+        text-decoration: none;
+        font-weight: 550;
+    }
+    .contact-item a:hover { color: #f15d30; }
+
+    /* Map */
+    #hotel-map {
+        width: 100%;
+        height: 320px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        margin-top: 10px;
+    }
+    .no-map-placeholder {
+        width: 100%;
+        height: 320px;
+        background: #f1f5f9;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .booking-widget-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e2e8f0;
+        padding: 30px;
+        position: sticky;
+        top: 20px;
+    }
+    .widget-price-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .widget-price-value {
+        font-size: 2rem;
+        font-weight: 850;
+        color: #f15d30;
+        margin: 5px 0 15px;
+    }
+    .widget-divider {
+        height: 1px;
+        background: #e2e8f0;
+        margin: 20px 0;
+    }
+    .widget-benefit {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: #475569;
+        margin-bottom: 12px;
+        font-weight: 550;
+    }
+    .widget-benefit i { color: #10b981; }
+    .btn-widget-book {
+        display: block;
+        text-align: center;
+        background: linear-gradient(135deg, #f15d30, #ff7e40);
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(241, 93, 48, 0.25);
+        transition: all 0.3s;
+        border: none;
+        width: 100%;
+    }
+    .btn-widget-book:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(241, 93, 48, 0.35);
+        color: #fff;
+    }
+</style>
+
+<div class="hotel-details-wrapper">
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumb-nav">
+            <a href="/">Home</a> <span>/</span> <a href="/Hotel">Hotels</a> <span>/</span> <span>@Model.Name</span>
+        </div>
+
+        <div class="row">
+            <!-- Left Side -->
+            <div class="col-lg-8 mb-4">
+                <div class="details-card">
+                    <!-- Hotel Header -->
+                    <div class="hotel-header">
+                        <div class="hotel-stars">
+                            @for (int i = 0; i < Model.StarRating; i++)
+                            {
+                                <i class="fa fa-star"></i>
+                            }
+                        </div>
+                        <div class="hotel-title-row">
+                            <div class="hotel-title-group">
+                                <h1>@Model.Name <span class="hotel-type-badge-detail">@Model.HotelType</span></h1>
+                            </div>
+                        </div>
+                        <div class="hotel-address">
+                            <i class="fa fa-map-marker"></i>
+                            <span>@Model.Address, @Model.City, Vietnam</span>
+                        </div>
+                    </div>
+
+                    <!-- Hero Image -->
+                    <div class="hotel-hero-img-box">
+                        <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/bg_1.jpg" : Model.ImageUrl)"
+                             class="hotel-hero-img" alt="@Model.Name" />
+                    </div>
+
+                    <!-- Description -->
+                    <h3 class="info-section-title"><i class="fa fa-info-circle"></i> About this stay</h3>
+                    <div class="description-text">
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            @Model.Description
+                        }
+                        else
+                        {
+                            <span>Experience ultimate comfort and signature Vietnamese hospitality at @Model.Name. Boasting scenic surroundings, stylish accommodations, and outstanding leisure services, this is the perfect base for your vacation.</span>
+                        }
+                    </div>
+
+                    <!-- Amenities -->
+                    <h3 class="info-section-title"><i class="fa fa-concierge-bell"></i> Amenities Offered</h3>
+                    <div class="amenities-grid">
+                        @if (!string.IsNullOrEmpty(Model.Amenities))
+                        {
+                            foreach (var amenity in Model.Amenities.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                <div class="amenity-item">
+                                    <i class="fa fa-check-circle"></i>
+                                    <span>@amenity.Trim()</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="amenity-item"><i class="fa fa-check-circle"></i> Free WiFi</div>
+                            <div class="amenity-item"><i class="fa fa-check-circle"></i> 24h Front Desk</div>
+                            <div class="amenity-item"><i class="fa fa-check-circle"></i> Air Conditioning</div>
+                            <div class="amenity-item"><i class="fa fa-check-circle"></i> Private Bathroom</div>
+                        }
+                    </div>
+
+                    <!-- Contact Details -->
+                    <h3 class="info-section-title"><i class="fa fa-address-book"></i> Contact Details</h3>
+                    <div class="contact-grid">
+                        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                        {
+                            <div class="contact-item">
+                                <i class="fa fa-phone"></i>
+                                <span>Phone: <strong>@Model.PhoneNumber</strong></span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Email))
+                        {
+                            <div class="contact-item">
+                                <i class="fa fa-envelope"></i>
+                                <a href="mailto:@Model.Email">@Model.Email</a>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Website))
+                        {
+                            <div class="contact-item">
+                                <i class="fa fa-globe"></i>
+                                <a href="http://@Model.Website" target="_blank">Visit Website</a>
+                            </div>
+                        }
+                        <div class="contact-item">
+                            <i class="fa fa-map"></i>
+                            <span>City: @Model.City</span>
+                        </div>
+                    </div>
+
+                    <!-- Map Section -->
+                    <h3 class="info-section-title"><i class="fa fa-map-o"></i> Location on Map</h3>
+                    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                    {
+                        <div id="hotel-map"></div>
+                    }
+                    else
+                    {
+                        <div class="no-map-placeholder">
+                            <i class="fa fa-map-o"></i>
+                            <span>Map coordinates not available for this property.</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Right Side Booking Card -->
+            <div class="col-lg-4">
+                <div class="booking-widget-card">
+                    <div class="widget-price-label">Price per night</div>
+                    <div class="widget-price-value">@Model.PricePerNight.ToString("N0") ₫</div>
+
+                    <div class="widget-benefit">
+                        <i class="fa fa-check"></i>
+                        <span>Includes all service charges &amp; VAT</span>
+                    </div>
+                    <div class="widget-benefit">
+                        <i class="fa fa-check"></i>
+                        <span>Free cancellation up to 48 hours</span>
+                    </div>
+                    <div class="widget-benefit">
+                        <i class="fa fa-check"></i>
+                        <span>WiFi included in all rooms</span>
+                    </div>
+
+                    <div class="widget-divider"></div>
+
+                    <a href="/Hotel/Book?hotelId=@Model.HotelID" class="btn-widget-book">Book Rooms Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+{
+    <!-- Leaflet Map (no API key required) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var lat = @Model.Latitude;
+            var lng = @Model.Longitude;
+            var hotelName = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Name));
+            var address = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Address + ", " + Model.City + ", Vietnam"));
+
+            var map = L.map('hotel-map').setView([lat, lng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var icon = L.divIcon({
+                className: '',
+                html: '<div style="background:#f15d30;color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,0.3);border:2px solid #fff;"><i class="fa fa-bed"></i></div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -20]
+            });
+
+            L.marker([lat, lng], { icon: icon })
+                .addTo(map)
+                .bindPopup('<strong>' + hotelName + '</strong><br><small>' + address + '</small>', { maxWidth: 220 })
+                .openPopup();
+        });
+    </script>
+}

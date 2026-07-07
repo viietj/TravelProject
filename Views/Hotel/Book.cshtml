@@ -1,0 +1,482 @@
+@{
+    Layout = "_Layout";
+    var hotel = ViewBag.Hotel as TravelProject.Models.Hotel;
+    ViewData["Title"] = $"Book at {hotel?.Name}";
+}
+
+<style>
+    /* Fix transparent navbar */
+    #ftco-navbar {
+        background: #1a1a2e !important;
+        position: relative !important;
+        top: 0;
+    }
+
+    .hotel-book-wrapper {
+        max-width: 1000px;
+        margin: 40px auto 70px;
+        padding: 0 16px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Master Layout Grid */
+    .book-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        gap: 30px;
+    }
+
+    @@media (max-width: 768px) {
+        .book-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Cards */
+    .book-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+        padding: 30px;
+        border: 1.5px solid #edf2f7;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 750;
+        color: #1a1a2e;
+        margin-bottom: 25px;
+        border-bottom: 2.5px solid #f15d30;
+        padding-bottom: 8px;
+        display: inline-block;
+    }
+
+    /* Form Fields */
+    .form-group-custom {
+        margin-bottom: 20px;
+    }
+
+    .form-group-custom label {
+        font-weight: 650;
+        font-size: 0.85rem;
+        color: #4a5568;
+        display: block;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-input-custom {
+        width: 100%;
+        border-radius: 8px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 0.92rem;
+        transition: all 0.2s;
+        background-color: #fff;
+    }
+
+    .form-input-custom:focus {
+        border-color: #f15d30;
+        box-shadow: 0 0 0 3px rgba(241, 93, 48, 0.15);
+        outline: none;
+    }
+
+    .form-row-custom {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Side Detail Summary Panel */
+    .side-panel {
+        background: #f8fafc;
+        border-radius: 16px;
+        border: 1.5px solid #e2e8f0;
+        padding: 24px;
+    }
+
+    .hotel-summary-header {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        border-bottom: 1.5px solid #e2e8f0;
+        padding-bottom: 15px;
+    }
+
+    .summary-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .summary-title-group h4 {
+        font-size: 1.05rem;
+        font-weight: 750;
+        color: #1a1a2e;
+        margin-bottom: 4px;
+    }
+
+    .summary-stars {
+        color: #fbbf24;
+        font-size: 0.8rem;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.88rem;
+        color: #475569;
+        margin-bottom: 10px;
+    }
+
+    .detail-row-bold {
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    /* Price Panel */
+    .price-panel {
+        background: #ecfdf5;
+        border: 1.5px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 25px;
+    }
+
+    .price-title {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #065f46;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .price-val {
+        font-size: 1.65rem;
+        font-weight: 850;
+        color: #047857;
+        margin-top: 4px;
+    }
+
+    .price-details-note {
+        font-size: 0.78rem;
+        color: #065f46;
+        margin-top: 6px;
+        font-style: italic;
+    }
+
+    .btn-submit-booking {
+        background: linear-gradient(135deg, #f15d30, #ff7e40);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(241, 93, 48, 0.2);
+        transition: all 0.3s;
+    }
+
+    .btn-submit-booking:hover {
+        box-shadow: 0 6px 20px rgba(241, 93, 48, 0.3);
+        transform: translateY(-1px);
+    }
+</style>
+
+<div class="hotel-book-wrapper">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="border-radius: 10px; margin-bottom: 25px;">
+            ⚠️ @TempData["Error"]
+        </div>
+    }
+
+    <div class="book-grid">
+        <!-- Left Side Form -->
+        <div class="book-card">
+            <h3 class="card-title">Reservation Form</h3>
+
+            <form action="/Hotel/Book" method="post">
+                <input type="hidden" name="hotelId" value="@hotel?.HotelID" />
+
+                <!-- Customer Info -->
+                <div class="form-group-custom">
+                    <label>Full Name</label>
+                    <input type="text" name="customerName" class="form-input-custom" required value="@ViewBag.CustomerName" />
+                </div>
+
+                <div class="form-row-custom">
+                    <div class="form-group-custom">
+                        <label>Phone Number</label>
+                        <input type="tel" name="customerPhone" class="form-input-custom" required value="@ViewBag.CustomerPhone" />
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Email Address</label>
+                        <input type="email" name="customerEmail" class="form-input-custom" required value="@ViewBag.CustomerEmail" />
+                    </div>
+                </div>
+
+
+                <!-- Stay Details -->
+                <div class="form-row-custom">
+                    <div class="form-group-custom">
+                        <label>Check-in Date</label>
+                        <input type="date" name="checkInDate" id="checkInDate" class="form-input-custom" required min="@DateTime.Today.ToString("yyyy-MM-dd")" value="@ViewBag.CheckInDate" />
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Check-out Date</label>
+                        <input type="date" name="checkOutDate" id="checkOutDate" class="form-input-custom" required min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" value="@ViewBag.CheckOutDate" />
+                    </div>
+                </div>
+
+                <div class="form-row-custom">
+                    <div class="form-group-custom">
+                        <label>Room Count</label>
+                        <select name="roomCount" id="roomCount" class="form-input-custom">
+                            @for (int i = 1; i <= 10; i++)
+                            {
+                                <option value="@i" selected="@(ViewBag.RoomCount == i ? "selected" : null)">@i Room@(i > 1 ? "s" : "")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Room Type</label>
+                        <select name="roomType" id="roomType" class="form-input-custom">
+                            <option value="Standard" selected="@(ViewBag.RoomType == "Standard" ? "selected" : null)">Standard (Base Price)</option>
+                            <option value="Deluxe" selected="@(ViewBag.RoomType == "Deluxe" ? "selected" : null)">Deluxe (+30%)</option>
+                            <option value="Suite" selected="@(ViewBag.RoomType == "Suite" ? "selected" : null)">Suite (+80%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="font-size:0.85rem; color:#f15d30; font-weight:600; margin-bottom: 20px; display: flex; align-items: center; gap: 6px;" id="available-rooms-badge">
+                    <i class="fa fa-info-circle"></i> Available rooms: <span id="available-rooms-count">@(ViewBag.AvailableRooms ?? 10)</span>
+                </div>
+
+                <div class="form-row-custom">
+                    <div class="form-group-custom">
+                        <label>Adults</label>
+                        <select name="adultCount" class="form-input-custom">
+                            @for (int i = 1; i <= 10; i++)
+                            {
+                                <option value="@i" selected="@(ViewBag.AdultCount == i ? "selected" : null)">@i Adult@(i > 1 ? "s" : "")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group-custom">
+                        <label>Children</label>
+                        <select name="childCount" class="form-input-custom">
+                            @for (int i = 0; i <= 10; i++)
+                            {
+                                <option value="@i" selected="@(ViewBag.ChildCount == i ? "selected" : null)">@i Child@(i > 1 ? "ren" : "")</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Special Requests -->
+                <div class="form-group-custom">
+                    <label>Special Requests / Notes</label>
+                    <textarea name="notes" class="form-input-custom" rows="3" placeholder="Enter room requests, arrival time, etc.">@ViewBag.Notes</textarea>
+                </div>
+
+                <button type="submit" class="btn-submit-booking" id="confirm-hotel-booking-btn">Confirm Booking</button>
+            </form>
+        </div>
+
+        <!-- Right Side Hotel Summary & Live Price Panel -->
+        <div class="side-panel">
+            <div class="hotel-summary-header">
+                <img src="@(string.IsNullOrEmpty(hotel?.ImageUrl) ? "/images/bg_1.jpg" : hotel.ImageUrl)" class="summary-img" alt="@hotel?.Name" />
+                <div class="summary-title-group">
+                    <h4>@hotel?.Name</h4>
+                    <div class="summary-stars">
+                        @for (int i = 0; i < (hotel?.StarRating ?? 0); i++)
+                        {
+                            <i class="fa fa-star"></i>
+                        }
+                    </div>
+                    <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">@hotel?.Address, @hotel?.City</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <span>Room Base Rate:</span>
+                <span class="detail-row-bold">@hotel?.PricePerNight.ToString("N0") đ/night</span>
+            </div>
+            
+            <div class="detail-row">
+                <span>Location:</span>
+                <span>@hotel?.City</span>
+            </div>
+
+            <div class="widget-divider"></div>
+
+            <div class="detail-row">
+                <span>Selected Room Type:</span>
+                <span id="summary-room-type">Standard</span>
+            </div>
+
+            <div class="detail-row">
+                <span>Nights:</span>
+                <span id="summary-nights" class="detail-row-bold">0</span>
+            </div>
+
+            <!-- Price Output Box -->
+            <div class="price-panel">
+                <div class="price-title">Estimated Total Price</div>
+                <div class="price-val" id="totalPriceDisplay">-- đ</div>
+                <div class="price-details-note" id="priceExplanation">Please select check-in and check-out dates</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const basePrice = @(hotel?.PricePerNight ?? 0);
+    const hotelId = @(hotel?.HotelID ?? 0);
+
+    const checkInInput  = document.getElementById('checkInDate');
+    const checkOutInput = document.getElementById('checkOutDate');
+    const roomCountInput = document.getElementById('roomCount');
+    const roomTypeInput  = document.getElementById('roomType');
+    const summaryRoomType   = document.getElementById('summary-room-type');
+    const summaryNights     = document.getElementById('summary-nights');
+    const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+    const priceExplanation  = document.getElementById('priceExplanation');
+    const availableRoomsCount = document.getElementById('available-rooms-count');
+    const submitBtn = document.getElementById('confirm-hotel-booking-btn');
+
+    // Set default dates if not already set by model error restoration
+    (function initDates() {
+        const today    = new Date();
+        const tomorrow = new Date(today);  tomorrow.setDate(today.getDate() + 1);
+        const dayAfter = new Date(today);  dayAfter.setDate(today.getDate() + 2);
+
+        if (!checkInInput.value) {
+            checkInInput.setAttribute('value',  tomorrow.toISOString().split('T')[0]);
+            checkInInput.value  = tomorrow.toISOString().split('T')[0];
+        }
+        if (!checkOutInput.value) {
+            checkOutInput.setAttribute('value', dayAfter.toISOString().split('T')[0]);
+            checkOutInput.value = dayAfter.toISOString().split('T')[0];
+        }
+
+        const checkInVal = new Date(checkInInput.value);
+        const nextDay    = new Date(checkInVal);
+        nextDay.setDate(nextDay.getDate() + 1);
+        checkOutInput.min = nextDay.toISOString().split('T')[0];
+    })();
+
+    checkInInput.addEventListener('change', function () {
+        const checkInVal = new Date(checkInInput.value);
+        const nextDay    = new Date(checkInVal);
+        nextDay.setDate(nextDay.getDate() + 1);
+        checkOutInput.min = nextDay.toISOString().split('T')[0];
+        if (new Date(checkOutInput.value) <= checkInVal) {
+            checkOutInput.value = nextDay.toISOString().split('T')[0];
+        }
+        calculatePriceAndAvailability();
+    });
+
+    checkOutInput.addEventListener('change',  calculatePriceAndAvailability);
+    roomTypeInput.addEventListener('change',  calculatePriceAndAvailability);
+    roomCountInput.addEventListener('change', calculatePriceAndAvailability);
+
+    function calculatePriceAndAvailability() {
+        calculatePrice();
+        checkAvailability();
+    }
+
+    function calculatePrice() {
+        const checkIn  = new Date(checkInInput.value);
+        const checkOut = new Date(checkOutInput.value);
+
+        if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime()) || checkOut <= checkIn) {
+            totalPriceDisplay.textContent = '-- đ';
+            summaryNights.textContent     = '0';
+            priceExplanation.textContent  = 'Please select valid check-in and check-out dates';
+            return;
+        }
+
+        const nights = Math.ceil((checkOut - checkIn) / 86400000);
+        summaryNights.textContent = nights;
+
+        const roomType = roomTypeInput.value;
+        summaryRoomType.textContent = roomType;
+        const multiplier = roomType === 'Deluxe' ? 1.3 : roomType === 'Suite' ? 1.8 : 1.0;
+
+        const rooms = parseInt(roomCountInput.value) || 1;
+        const total = basePrice * rooms * nights * multiplier;
+
+        totalPriceDisplay.textContent = total.toLocaleString('vi-VN') + ' đ';
+
+        const typeNote = roomType !== 'Standard' ? ` (${roomType} x${multiplier})` : '';
+        priceExplanation.textContent =
+            `${rooms} Room(s) x ${nights} Night(s) x ${basePrice.toLocaleString('vi-VN')} đ${typeNote}`;
+    }
+
+    function checkAvailability() {
+        const checkIn = checkInInput.value;
+        const checkOut = checkOutInput.value;
+        const roomType = roomTypeInput.value;
+
+        if (!checkIn || !checkOut || !roomType) return;
+
+        fetch(`/Hotel/GetAvailableRooms?hotelId=${hotelId}&roomType=${roomType}&checkIn=${checkIn}&checkOut=${checkOut}`)
+            .then(res => res.json())
+            .then(data => {
+                const available = data.availableRooms;
+                availableRoomsCount.textContent = available;
+
+                // Dynamically update roomCount dropdown options
+                const currentSelected = parseInt(roomCountInput.value) || 1;
+                roomCountInput.innerHTML = '';
+                
+                if (available === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = '0';
+                    opt.textContent = '0 Rooms (Fully Booked)';
+                    roomCountInput.appendChild(opt);
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Fully Booked';
+                    submitBtn.style.background = '#cbd5e1';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Confirm Booking';
+                    submitBtn.style.background = 'linear-gradient(135deg, #f15d30, #ff7e40)';
+
+                    for (let i = 1; i <= Math.min(available, 10); i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = `${i} Room${i > 1 ? 's' : ''}`;
+                        if (i === currentSelected || (i === available && currentSelected > available)) {
+                            opt.selected = true;
+                        }
+                        roomCountInput.appendChild(opt);
+                    }
+                }
+                calculatePrice();
+            })
+            .catch(err => console.error("Error fetching rooms availability:", err));
+    }
+
+    // Prevent double submit
+    const hotelForm = document.querySelector('form[action="/Hotel/Book"]');
+    if (hotelForm) {
+        hotelForm.addEventListener('submit', function() {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
+        });
+    }
+
+    // Initial call on load
+    document.addEventListener('DOMContentLoaded', () => {
+        calculatePriceAndAvailability();
+    });
+</script>

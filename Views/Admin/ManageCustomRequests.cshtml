@@ -1,0 +1,317 @@
+@model List<TravelProject.Models.CustomTourRequest>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Custom Tour Requests";
+}
+
+<style>
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-btn {
+        padding: 8px 20px; border-radius: 20px;
+        font-size: 0.85rem; font-weight: 600;
+        text-decoration: none; border: 1.5px solid #dee2e6;
+        color: #495057; background: white; transition: all 0.2s;
+    }
+    .filter-btn:hover { background: #f8f9fa; }
+    .filter-btn.active-all      { background: #343a40; color: white; border-color: #343a40; }
+    .filter-btn.active-pending  { background: #fff3cd; color: #856404; border-color: #ffc107; }
+    .filter-btn.active-quoted   { background: #cff4fc; color: #055160; border-color: #0dcaf0; }
+    .filter-btn.active-accepted { background: #d1e7dd; color: #0a3622; border-color: #198754; }
+
+    .stat-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-card {
+        flex: 1; min-width: 150px;
+        background: white; border-radius: 12px;
+        padding: 20px; text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border-top: 4px solid #dee2e6;
+    }
+    .stat-card.pending  { border-top-color: #ffc107; }
+    .stat-card.quoted   { border-top-color: #0dcaf0; }
+    .stat-card.accepted { border-top-color: #198754; }
+    .stat-card .stat-num   { font-size: 2rem; font-weight: 800; color: #1a1a2e; }
+    .stat-card .stat-label { font-size: 0.82rem; color: #888; font-weight: 600; }
+
+    .req-card {
+        background: white; border-radius: 14px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        margin-bottom: 20px; overflow: hidden;
+        border: 1.5px solid #f0f0f0;
+        transition: box-shadow 0.2s;
+    }
+    .req-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+    .req-card-header {
+        display: flex; justify-content: space-between;
+        align-items: center; flex-wrap: wrap; gap: 12px;
+        padding: 18px 24px;
+        border-bottom: 1px solid #f0f0f0;
+        background: #fafafa;
+    }
+    .req-id { font-weight: 800; font-size: 1rem; color: #1a1a2e; }
+    .req-meta { font-size: 0.8rem; color: #888; margin-top: 2px; }
+    .req-card-body { padding: 20px 24px; }
+
+    .req-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    .info-lbl { font-size: 0.75rem; color: #888; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+    .info-val { font-size: 0.9rem; font-weight: 600; color: #2d3748; }
+
+    .badge-status {
+        padding: 5px 14px; border-radius: 20px;
+        font-size: 0.78rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        display: inline-block;
+    }
+    .badge-pending   { background: #fff3cd; color: #856404; }
+    .badge-quoted    { background: #cff4fc; color: #055160; }
+    .badge-accepted  { background: #d1e7dd; color: #0a3622; }
+    .badge-rejected  { background: #f8d7da; color: #842029; }
+
+    /* Quote form section */
+    .quote-section {
+        background: linear-gradient(135deg, #f0f7ff, #e8f4fd);
+        border: 1.5px solid #bee3f8;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-top: 16px;
+    }
+    .quote-section h6 {
+        font-weight: 700; color: #2c5282;
+        margin-bottom: 14px; font-size: 0.95rem;
+    }
+    .quote-input-row {
+        display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;
+    }
+    .quote-input-group { flex: 1; min-width: 200px; }
+    .quote-input-group label {
+        display: block; font-size: 0.8rem;
+        font-weight: 600; color: #555; margin-bottom: 6px;
+    }
+    .quote-input-group input {
+        width: 100%; padding: 10px 14px;
+        border: 1.5px solid #bee3f8; border-radius: 8px;
+        font-size: 0.95rem; box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    .quote-input-group input:focus {
+        outline: none; border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66,153,225,0.15);
+    }
+    .btn-send-quote {
+        padding: 10px 22px; background: #2b6cb0; color: white;
+        border: none; border-radius: 8px; font-size: 0.9rem;
+        font-weight: 700; cursor: pointer; transition: background 0.2s;
+        white-space: nowrap;
+    }
+    .btn-send-quote:hover { background: #2c5282; }
+    .btn-reject-req {
+        padding: 10px 18px; background: white; color: #dc3545;
+        border: 1.5px solid #dc3545; border-radius: 8px;
+        font-size: 0.85rem; font-weight: 700;
+        cursor: pointer; transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .btn-reject-req:hover { background: #fff5f5; }
+
+    .quoted-price-box {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: #fff3cd; border: 1px solid #ffc107;
+        border-radius: 8px; padding: 8px 16px;
+        font-weight: 700; color: #856404; font-size: 0.95rem;
+    }
+    .note-box {
+        background: #f7fafc; border-left: 3px solid #cbd5e0;
+        border-radius: 6px; padding: 10px 14px;
+        font-size: 0.85rem; color: #555; margin-top: 12px;
+    }
+    .alert-success-admin {
+        background: #d1e7dd; border: 1px solid #badbcc;
+        color: #0a3622; padding: 12px 18px;
+        border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <h2 class="mb-4" style="font-weight: 800; color: #1a1a2e;">
+        Manage Custom Tour Requests
+    </h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-success-admin">✅ @TempData["Success"]</div>
+    }
+
+    <!-- Stat Cards -->
+    <div class="stat-cards">
+        <div class="stat-card pending">
+            <div class="stat-num">@ViewBag.PendingCount</div>
+            <div class="stat-label">Awaiting Quote</div>
+        </div>
+        <div class="stat-card quoted">
+            <div class="stat-num">@ViewBag.QuotedCount</div>
+            <div class="stat-label">Quoted</div>
+        </div>
+        <div class="stat-card accepted">
+            <div class="stat-num">@ViewBag.AcceptedCount</div>
+            <div class="stat-label">Accepted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-num">@Model.Count</div>
+            <div class="stat-label">Showing Now</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <a href="/Admin/ManageCustomRequests"
+           class="filter-btn @(ViewBag.StatusFilter == null ? "active-all" : "")">
+            All Requests
+        </a>
+        <a href="/Admin/ManageCustomRequests?status=Pending"
+           class="filter-btn @(ViewBag.StatusFilter == "Pending" ? "active-pending" : "")">
+            Awaiting Quote
+        </a>
+        <a href="/Admin/ManageCustomRequests?status=Quoted"
+           class="filter-btn @(ViewBag.StatusFilter == "Quoted" ? "active-quoted" : "")">
+            Quoted
+        </a>
+        <a href="/Admin/ManageCustomRequests?status=Accepted"
+           class="filter-btn @(ViewBag.StatusFilter == "Accepted" ? "active-accepted" : "")">
+            Accepted
+        </a>
+    </div>
+
+    <!-- Request Cards -->
+    @if (!Model.Any())
+    {
+        <div style="text-align:center; padding: 60px; background:white; border-radius:14px; color:#999;">
+            No custom tour requests found for the selected filter.
+        </div>
+    }
+
+    @foreach (var req in Model)
+    {
+        <div class="req-card">
+            <div class="req-card-header">
+                <div>
+                    <div class="req-id">Custom Tour Request #R@req.RequestID</div>
+                    <div class="req-meta">
+                        Submitted by: <strong>@(req.User?.FullName ?? req.User?.Username ?? "Unknown")</strong>
+                        (@(req.User?.Email ?? "—")) •
+                        @req.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+                <div>
+                    @if (req.Status == "Pending")
+                    {
+                        <span class="badge-status badge-pending">Awaiting Quote</span>
+                    }
+                    else if (req.Status == "Quoted")
+                    {
+                        <span class="badge-status badge-quoted">Quoted</span>
+                    }
+                    else if (req.Status == "Accepted")
+                    {
+                        <span class="badge-status badge-accepted">Accepted by Customer</span>
+                    }
+                    else
+                    {
+                        <span class="badge-status badge-rejected">Rejected</span>
+                    }
+                </div>
+            </div>
+
+            <div class="req-card-body">
+                <!-- Request Details Grid -->
+                <div class="req-grid">
+                    <div>
+                        <div class="info-lbl">Destinations</div>
+                        <div class="info-val">@req.Destinations</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Departure Date</div>
+                        <div class="info-val">@req.DepartureDate.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Duration</div>
+                        <div class="info-val">@req.DurationDays Day(s)</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Guests</div>
+                        <div class="info-val">
+                            @req.AdultCount Adult(s)
+                            @if (req.ChildCount > 0)
+                            {
+                                <span>, @req.ChildCount Child(ren)</span>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Hotel Standard</div>
+                        <div class="info-val">@(req.HotelStandard ?? "Not specified")</div>
+                    </div>
+                    <div>
+                        <div class="info-lbl">Transport Type</div>
+                        <div class="info-val">@(req.TransportType ?? "Not specified")</div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(req.Note))
+                {
+                    <div class="note-box">
+                        <strong>Customer Note:</strong> @req.Note
+                    </div>
+                }
+
+                <!-- Quote Actions -->
+                @if (req.Status == "Pending")
+                {
+                    <div class="quote-section">
+                        <h6>Send Price Quote to Customer</h6>
+                        <form method="post" action="/Admin/SendQuote">
+                            <input type="hidden" name="requestId" value="@req.RequestID" />
+                            <div class="quote-input-row">
+                                <div class="quote-input-group">
+                                    <label>Total Package Price (VND)</label>
+                                    <input type="number" name="quotedPrice" min="1"
+                                           step="1000" placeholder="e.g. 15000000" required />
+                                </div>
+                                <button type="submit" class="btn-send-quote"
+                                        onclick="return confirm('Send this quote to the customer?')">
+                                    Send Quote
+                                </button>
+                                <form method="post" action="/Admin/RejectCustomRequest" style="margin:0;">
+                                    <input type="hidden" name="requestId" value="@req.RequestID" />
+                                    <button type="submit" class="btn-reject-req"
+                                            onclick="return confirm('Reject this request?')">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </form>
+                    </div>
+                }
+                else if (req.Status == "Quoted")
+                {
+                    <div style="margin-top: 14px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                        <div class="quoted-price-box">
+                            Quoted Price: @req.QuotedPrice?.ToString("N0") VND
+                        </div>
+                        <span style="font-size:0.85rem; color:#888;">Waiting for customer decision...</span>
+                    </div>
+                }
+                else if (req.Status == "Accepted")
+                {
+                    <div style="margin-top: 14px; background: #d1e7dd; border-radius: 10px; padding: 14px 18px; font-size:0.9rem; color:#0a3622; font-weight:600;">
+                        🎉 Customer accepted the quote of <strong>@req.QuotedPrice?.ToString("N0") VND</strong>.
+                        Please contact them to proceed with contract signing and payment.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

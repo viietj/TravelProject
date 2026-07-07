@@ -1,0 +1,566 @@
+@model List<TravelProject.Models.Booking>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Booking History";
+    var customRequests = ViewBag.CustomRequests as List<TravelProject.Models.CustomTourRequest>;
+}
+
+<style>
+    /* Fix transparent navbar blending with white page background */
+    #ftco-navbar {
+        background: #1a1a2e !important;
+        position: relative !important;
+        top: 0;
+    }
+    .mybookings-wrapper {
+        max-width: 1100px;
+        margin: 30px auto 50px;
+        padding: 0 16px 80px;
+        font-family: 'Poppins', sans-serif;
+    }
+    .header-orange-container {
+        background: linear-gradient(135deg, #f15d30, #ff7e40);
+        border-radius: 20px;
+        padding: 40px 30px;
+        margin-bottom: 40px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(241, 93, 48, 0.15);
+    }
+    .page-header {
+        margin-bottom: 25px;
+    }
+    .page-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+    .page-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.95rem;
+    }
+    /* Alert styles */
+    .alert-success {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #065f46;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        font-size: 0.9rem;
+    }
+    .alert-error {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #991b1b;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        font-size: 0.9rem;
+    }
+    /* Tabs Navigation */
+    .tab-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+        padding-bottom: 20px;
+    }
+    .tab-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 10px 24px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 30px;
+    }
+    .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+    .tab-btn.active {
+        background: #ffffff;
+        color: #f15d30;
+        border-color: #ffffff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    /* Card design for bookings */
+    .booking-item {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        padding: 24px;
+        margin-bottom: 20px;
+        border: 1.5px solid #edf2f7;
+        transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .booking-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #edf2f7;
+        margin-bottom: 16px;
+    }
+    .booking-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        line-height: 1.4;
+    }
+    .booking-date-id {
+        font-size: 0.82rem;
+        color: #718096;
+        margin-top: 4px;
+    }
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-pending { background: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
+    .status-confirmed { background: #ecfdf5; color: #047857; border: 1px solid #d1fae5; }
+    .status-cancelled { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+    .status-quoted { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .status-accepted { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+    .status-rejected { background: #fff1f2; color: #be123c; border: 1px solid #ffe4e6; }
+
+    .booking-body-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        font-size: 0.9rem;
+        color: #4a5568;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #718096;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    .info-value {
+        font-weight: 600;
+        color: #2d3748;
+    }
+    .info-total {
+        color: #2b6cb0;
+        font-weight: 750;
+        font-size: 1.1rem;
+    }
+    .booking-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #edf2f7;
+    }
+    .cancel-btn {
+        background-color: #fff;
+        border: 1.5px solid #feb2b2;
+        color: #e53e3e;
+        padding: 8px 18px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .cancel-btn:hover {
+        background-color: #fff5f5;
+        border-color: #e53e3e;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        border-radius: 16px;
+        border: 1.5px solid #edf2f7;
+    }
+    .empty-state h3 {
+        font-size: 1.25rem;
+        color: #4a5568;
+        margin-bottom: 12px;
+        font-weight: 700;
+    }
+    .empty-state p {
+        color: #718096;
+        margin-bottom: 24px;
+        font-size: 0.92rem;
+    }
+    .empty-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #4f8ef7, #0d47a1);
+        color: white;
+        font-weight: 700;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    .empty-btn:hover {
+        box-shadow: 0 6px 15px rgba(79,142,247,0.3);
+    }
+</style>
+
+<div class="mybookings-wrapper">
+    <div class="header-orange-container">
+        <div class="page-header">
+            <h1>Manage Your Bookings</h1>
+            <p>Track your standard tour bookings and custom tour proposals below</p>
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab(event, 'tour-bookings')">Standard Bookings</button>
+            <button class="tab-btn" onclick="switchTab(event, 'custom-tours')">Custom Tour Proposals</button>
+            <button class="tab-btn" onclick="switchTab(event, 'hotel-bookings')">Hotel Reservations</button>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-success">🎉 @TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-error">⚠️ @TempData["Error"]</div>
+    }
+
+    <!-- TAB 1: STANDARD TOUR BOOKINGS -->
+    <div id="tour-bookings" class="tab-content active">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <h3>You haven't booked any tours yet</h3>
+                <p>Explore our highly-recommended premium travel packages in Vietnam today!</p>
+                <a href="/Tour" class="empty-btn">Explore Tours</a>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <div class="booking-title">@item.Tour?.Title</div>
+                            <div class="booking-date-id">Booking ID: #B@(item.BookingID) • Booked Date: @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            @if (item.Status == "Pending")
+                            {
+                                <span class="status-badge status-pending">Pending</span>
+                            }
+                            else if (item.Status == "Confirmed")
+                            {
+                                <span class="status-badge status-confirmed">Confirmed</span>
+                            }
+                            else if (item.Status == "Completed")
+                            {
+                                <span class="status-badge status-accepted" style="background:#e0f2fe; color:#0369a1; border: 1px solid #bae6fd;">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-cancelled">Cancelled</span>
+                            }
+
+                            @if (item.PaymentStatus == "Paid")
+                            {
+                                <span class="status-badge status-confirmed" style="background:#ecfdf5; color:#047857; border: 1px solid #d1fae5; text-transform:none;">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-cancelled" style="background:#fff1f2; color:#be123c; border: 1px solid #ffe4e6; text-transform:none;">Unpaid</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="booking-body-grid">
+                        <div>
+                            <div class="info-label">👤 Customer</div>
+                            <div class="info-value">@item.CustomerName</div>
+                        </div>
+                        <div>
+                            <div class="info-label">📞 Phone</div>
+                            <div class="info-value">@item.CustomerPhone</div>
+                        </div>
+                        <div>
+                            <div class="info-label">📅 Departure Date</div>
+                            <div class="info-value">@item.DepartureDate.ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div>
+                            <div class="info-label">👥 Guests</div>
+                            <div class="info-value">@item.AdultCount Adult(s) @(item.ChildCount > 0 ? $", {item.ChildCount} Child(ren)" : "")</div>
+                        </div>
+                        <div>
+                            <div class="info-label">💰 Total Paid</div>
+                            <div class="info-value info-total">@item.TotalPrice.ToString("N0") VND</div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(item.Notes))
+                    {
+                        <div style="margin-top: 14px; padding: 10px; background-color: #f7fafc; border-radius: 8px; font-size: 0.85rem; border-left: 3px solid #cbd5e0;">
+                            <strong>Your Notes:</strong> @item.Notes
+                        </div>
+                    }
+
+                    @if (item.Status == "Pending")
+                    {
+                        <div class="booking-footer">
+                            <span style="font-size: 0.8rem; color: #718096;">⚠️ You can cancel this booking while its status is Pending</span>
+                            <form method="post" action="/Booking/Cancel" onsubmit="return confirm('Are you sure you want to cancel this booking request?');">
+                                <input type="hidden" name="bookingId" value="@item.BookingID" />
+                                <button type="submit" class="cancel-btn">Cancel Booking</button>
+                            </form>
+                        </div>
+                    }
+
+                    @if (item.Status == "Confirmed" && item.PaymentStatus == "Unpaid")
+                    {
+                        <div class="booking-footer" style="background-color:#f0f9ff; padding: 14px 20px; border-radius: 10px; border: 1px solid #bae6fd; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size: 0.85rem; color: #0369a1; font-weight:600;"><i class="fa fa-info-circle"></i> Your booking has been confirmed! Please complete payment to finalize.</span>
+                            <a href="/Booking/Payment?bookingType=Tour&bookingId=@item.BookingID" class="empty-btn" style="padding: 8px 20px; font-size:0.85rem; background:linear-gradient(135deg, #3b82f6, #1d4ed8); border:none;">Pay Now</a>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <!-- TAB 2: CUSTOM TOUR REQUESTS -->
+    <div id="custom-tours" class="tab-content">
+        @if (customRequests == null || !customRequests.Any())
+        {
+            <div class="empty-state">
+                <h3>No custom tour requests found</h3>
+                <p>Want a fully personalized itinerary designed specifically for your family or group?</p>
+                <a href="/Booking/RequestCustom" class="empty-btn">Request Custom Tour</a>
+            </div>
+        }
+        else
+        {
+            foreach (var req in customRequests)
+            {
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <div class="booking-title" style="color: #2b6cb0;">✨ Custom Tour: @req.Destinations</div>
+                            <div class="booking-date-id">Request ID: #R@(req.RequestID) • Submitted: @req.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div>
+                            @if (req.Status == "Pending")
+                            {
+                                <span class="status-badge status-pending">Pending Quote</span>
+                            }
+                            else if (req.Status == "Quoted")
+                            {
+                                <span class="status-badge status-quoted">Quoted</span>
+                            }
+                            else if (req.Status == "Accepted")
+                            {
+                                <span class="status-badge status-accepted">Accepted</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-rejected">Declined</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="booking-body-grid">
+                        <div>
+                            <div class="info-label">📅 Expected Date</div>
+                            <div class="info-value">@req.DepartureDate.ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div>
+                            <div class="info-label">⏱ Duration</div>
+                            <div class="info-value">@req.DurationDays Day(s)</div>
+                        </div>
+                        <div>
+                            <div class="info-label">👥 Total Guests</div>
+                            <div class="info-value">@req.AdultCount Adult(s) @(req.ChildCount > 0 ? $", {req.ChildCount} Child(ren)" : "")</div>
+                        </div>
+                        <div>
+                            <div class="info-label">🏨 Hotel & Transport</div>
+                            <div class="info-value" style="font-size:0.85rem;">@(req.HotelStandard ?? "Default") • @(req.TransportType ?? "Default")</div>
+                        </div>
+                        <div>
+                            <div class="info-label">💰 Admin's Package Quote</div>
+                            <div class="info-value info-total" style="color:#d97706;">
+                                @(req.QuotedPrice.HasValue ? req.QuotedPrice.Value.ToString("N0") + " VND" : "Calculating...")
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(req.Note))
+                    {
+                        <div style="margin-top: 14px; padding: 10px; background-color: #f7fafc; border-radius: 8px; font-size: 0.85rem; border-left: 3px solid #cbd5e0;">
+                            <strong>Your Detailed Demands:</strong> @req.Note
+                        </div>
+                    }
+
+                    @if (req.Status == "Quoted" && req.QuotedPrice.HasValue)
+                    {
+                        <div class="booking-footer" style="background-color: #fffbeb; padding: 16px; border-radius: 12px; border: 1.5px dashed #fef3c7; flex-direction: column; align-items: stretch; gap: 12px;">
+                            <div style="font-size: 0.9rem; color: #92400e; font-weight:600;">
+                                🎉 Admin has provided a total package quote of <strong>@req.QuotedPrice.Value.ToString("N0") VND</strong> for your custom tour. Do you accept this quote?
+                            </div>
+                            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                <form method="post" action="/Booking/RejectCustom" style="margin:0;">
+                                    <input type="hidden" name="requestId" value="@req.RequestID" />
+                                    <button type="submit" class="cancel-btn" style="padding: 10px 20px;">Decline Quote</button>
+                                </form>
+                                <form method="post" action="/Booking/AcceptCustom" style="margin:0;">
+                                    <input type="hidden" name="requestId" value="@req.RequestID" />
+                                    <button type="submit" class="empty-btn" style="padding: 10px 20px; font-size: 0.88rem; border:none;">Accept & Book Tour</button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <!-- TAB 3: HOTEL RESERVATIONS -->
+    <div id="hotel-bookings" class="tab-content">
+        @if (ViewBag.HotelBookings == null || !((List<TravelProject.Models.HotelBooking>)ViewBag.HotelBookings).Any())
+        {
+            <div class="empty-state">
+                <h3>No hotel reservations found</h3>
+                <p>Find comfort and style at the best prices for your next stay!</p>
+                <a href="/Hotel" class="empty-btn">Find Hotels</a>
+            </div>
+        }
+        else
+        {
+            foreach (var item in (List<TravelProject.Models.HotelBooking>)ViewBag.HotelBookings)
+            {
+                <div class="booking-item">
+                    <div class="booking-header">
+                        <div>
+                            <div class="booking-title" style="color: #0d9488;">🏨 Hotel: @item.Hotel?.Name</div>
+                            <div class="booking-date-id">Reservation ID: #H@(item.BookingID) • Reserved: @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            @if (item.Status == "Pending")
+                            {
+                                <span class="status-badge status-pending">Pending</span>
+                            }
+                            else if (item.Status == "Confirmed")
+                            {
+                                <span class="status-badge status-confirmed">Confirmed</span>
+                            }
+                            else if (item.Status == "Completed")
+                            {
+                                <span class="status-badge status-confirmed" style="background:#e0f2fe; color:#0369a1; border: 1px solid #bae6fd; text-transform:none;">Completed</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-cancelled">Cancelled</span>
+                            }
+
+                            @if (item.PaymentStatus == "Paid")
+                            {
+                                <span class="status-badge status-confirmed" style="background:#ecfdf5; color:#047857; border: 1px solid #d1fae5; text-transform:none;">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="status-badge status-cancelled" style="background:#fff1f2; color:#be123c; border: 1px solid #ffe4e6; text-transform:none;">Unpaid</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="booking-body-grid">
+                        <div>
+                            <div class="info-label">👤 Guest Name</div>
+                            <div class="info-value">@item.CustomerName</div>
+                        </div>
+                        <div>
+                            <div class="info-label">📞 Phone</div>
+                            <div class="info-value">@item.CustomerPhone</div>
+                        </div>
+                        <div>
+                            <div class="info-label">📅 Stay Dates</div>
+                            <div class="info-value" style="font-size:0.88rem;">@item.CheckInDate.ToString("dd/MM/yyyy") - @item.CheckOutDate.ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div>
+                            <div class="info-label">🛏 Room Details</div>
+                            <div class="info-value">@item.RoomCount Room(s) (@item.RoomType)</div>
+                        </div>
+                        <div>
+                            <div class="info-label">💰 Total Cost</div>
+                            <div class="info-value info-total" style="color:#0d9488;">@item.TotalPrice.ToString("N0") VND</div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(item.Notes))
+                    {
+                        <div style="margin-top: 14px; padding: 10px; background-color: #f7fafc; border-radius: 8px; font-size: 0.85rem; border-left: 3px solid #cbd5e0;">
+                            <strong>Your Special Requests:</strong> @item.Notes
+                        </div>
+                    }
+
+                    @if (item.Status == "Pending")
+                    {
+                        <div class="booking-footer">
+                            <span style="font-size: 0.8rem; color: #718096;">⚠️ You can cancel this reservation while its status is Pending</span>
+                            <form method="post" action="/Hotel/CancelBooking" onsubmit="return confirm('Are you sure you want to cancel this hotel reservation?');">
+                                <input type="hidden" name="bookingId" value="@item.BookingID" />
+                                <button type="submit" class="cancel-btn">Cancel Reservation</button>
+                            </form>
+                        </div>
+                    }
+
+                    @if (item.Status == "Confirmed" && item.PaymentStatus == "Unpaid")
+                    {
+                        <div class="booking-footer" style="background-color:#f0f9ff; padding: 14px 20px; border-radius: 10px; border: 1px solid #bae6fd; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size: 0.85rem; color: #0369a1; font-weight:600;"><i class="fa fa-info-circle"></i> Your reservation has been confirmed! Please complete payment to finalize.</span>
+                            <a href="/Booking/Payment?bookingType=Hotel&bookingId=@item.BookingID" class="empty-btn" style="padding: 8px 20px; font-size:0.85rem; background:linear-gradient(135deg, #3b82f6, #1d4ed8); border:none;">Pay Now</a>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function switchTab(evt, tabId) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Deactivate all tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Show selected tab content and active tab button
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+</script>
+}

@@ -1,0 +1,64 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "User Management";
+}
+@model List<TravelProject.Models.User>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-users me-2"></i>User List</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-secondary">
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>@u.UserID</td>
+                        <td>@u.Username</td>
+                        <td>@u.FullName</td>
+                        <td>@u.Email</td>
+                        <td>
+                            <span class="badge @(u.Role == "Admin" ? "bg-danger" : "bg-secondary")">
+                                @u.Role
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(u.Status ? "bg-success" : "bg-secondary")">
+                                @(u.Status ? "Active" : "Locked")
+                            </span>
+                        </td>
+                        <td>
+                            <!-- Lock / Unlock account -->
+                            <form method="post" action="/User/ToggleStatus" style="display:inline">
+                                <input type="hidden" name="id" value="@u.UserID" />
+                                <button class="btn btn-sm @(u.Status ? "btn-warning" : "btn-success")">
+                                    @(u.Status ? "Lock" : "Unlock")
+                                </button>
+                            </form>
+                            <!-- Change role -->
+                            <form method="post" action="/User/SetRole" style="display:inline">
+                                <input type="hidden" name="id" value="@u.UserID" />
+                                <input type="hidden" name="role" value="@(u.Role == "Admin" ? "User" : "Admin")" />
+                                <button class="btn btn-sm btn-outline-danger">
+                                    → @(u.Role == "Admin" ? "User" : "Admin")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

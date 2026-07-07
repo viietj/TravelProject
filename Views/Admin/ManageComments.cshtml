@@ -1,0 +1,179 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Comment Management";
+}
+@model List<TravelProject.Models.Comment>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Comment Management</h5>
+        <span class="badge bg-secondary">@Model.Count comment(s)</span>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="card-body border-bottom pb-3 pt-3">
+        <form method="get" action="/Admin/ManageComments" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Filter by Destination</label>
+                <select name="destinationId" class="form-select form-select-sm">
+                    <option value="">All Destinations</option>
+                    @if (ViewBag.Destinations != null)
+                    {
+                        foreach (var d in ViewBag.Destinations)
+                        {
+                            bool isSelected = ViewBag.DestinationId != null && (int)ViewBag.DestinationId == d.DestinationID;
+                            if (isSelected)
+                            {
+                                <option value="@d.DestinationID" selected>@d.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@d.DestinationID">@d.Name</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Search (username / content)</label>
+                <input name="search" class="form-control form-control-sm"
+                       placeholder="Type to search..."
+                       value="@ViewBag.Search" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-search me-1"></i> Search
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="/Admin/ManageComments" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="fas fa-times me-1"></i> Clear
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="fas fa-comment-slash fa-2x mb-3"></i>
+                <p class="mb-0">No comments found.</p>
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover mb-0">
+                <thead class="table-secondary">
+                    <tr>
+                        <th style="width:60px">ID</th>
+                        <th style="width:140px">User</th>
+                        <th style="width:160px">Destination</th>
+                        <th>Content</th>
+                        <th style="width:80px">Rating</th>
+                        <th style="width:70px">Likes</th>
+                        <th style="width:110px">Type</th>
+                        <th style="width:130px">Date</th>
+                        <th style="width:90px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td class="text-muted small">#@c.CommentID</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (c.IsAdmin)
+                                    {
+                                        <span class="badge bg-danger">Admin</span>
+                                    }
+                                    <span class="fw-semibold">@c.UserName</span>
+                                </div>
+                            </td>
+                            <td class="small text-muted">
+                                @(c.Destination?.Name ?? $"Destination #{c.DestinationID}")
+                            </td>
+                            <td>
+                                @if (c.ParentCommentID != null)
+                                {
+                                    <span class="text-muted small me-1">↪ Reply to #@c.ParentCommentID</span>
+                                }
+                                <span class="small">
+                                    @(c.Content.Length > 120 ? c.Content.Substring(0, 120) + "…" : c.Content)
+                                </span>
+                                @if (!string.IsNullOrEmpty(c.ImageUrl))
+                                {
+                                    <a href="@c.ImageUrl" target="_blank" class="ms-2 small text-primary">
+                                        <i class="fas fa-image"></i> Image
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                @if (c.Rating.HasValue)
+                                {
+                                    for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="fa @(i <= c.Rating ? "fa-star text-warning" : "fa-star-o text-muted")" style="font-size:0.75rem;"></i>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">—</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="fas fa-heart text-danger me-1" style="font-size:0.7rem;"></i>@c.Likes
+                                </span>
+                            </td>
+                            <td>
+                                @if (c.ParentCommentID == null)
+                                {
+                                    <span class="badge bg-primary">Review</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Reply</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@c.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <form method="post" action="/Admin/DeleteComment"
+                                      onsubmit="return confirm('Delete comment #@c.CommentID? All replies will also be deleted.')">
+                                    <input type="hidden" name="commentId" value="@c.CommentID" />
+                                    <input type="hidden" name="destinationId" value="@ViewBag.DestinationId" />
+                                    <input type="hidden" name="search" value="@ViewBag.Search" />
+                                    <button class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="card-footer text-muted small">
+            Showing @Model.Count comment(s).
+            @{
+                int reviews = Model.Count(c => c.ParentCommentID == null);
+                int replies = Model.Count(c => c.ParentCommentID != null);
+            }
+            <span class="ms-2"><span class="badge bg-primary">@reviews</span> Reviews</span>
+            <span class="ms-1"><span class="badge bg-secondary">@replies</span> Replies</span>
+        </div>
+    }
+</div>

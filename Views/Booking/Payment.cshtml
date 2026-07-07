@@ -1,0 +1,302 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Thanh toán Đơn đặt hàng";
+    var bookingType = ViewBag.BookingType as string;
+    var bookingId = (int)ViewBag.BookingId;
+    var totalPrice = (decimal)ViewBag.TotalPrice;
+    var itemName = ViewBag.ItemName as string;
+}
+
+<style>
+    #ftco-navbar {
+        background: #1a1a2e !important;
+        position: relative !important;
+        top: 0;
+    }
+    .payment-container {
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 0 16px;
+        font-family: 'Poppins', sans-serif;
+    }
+    .payment-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid #edf2f7;
+        overflow: hidden;
+    }
+    .payment-header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    .payment-header h2 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.6rem;
+    }
+    .payment-header p {
+        margin: 10px 0 0;
+        opacity: 0.8;
+        font-size: 0.9rem;
+    }
+    .payment-body {
+        padding: 40px;
+    }
+    .summary-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 30px;
+        border: 1px solid #e2e8f0;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+    .summary-row:last-child {
+        margin-bottom: 0;
+        padding-top: 12px;
+        border-top: 1.5px dashed #cbd5e1;
+    }
+    .summary-total {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #ef4444;
+    }
+    .method-selector {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 35px;
+    }
+    @@media (max-width: 768px) {
+        .method-selector {
+            grid-template-columns: 1fr;
+        }
+    }
+    .method-option {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .method-option:hover {
+        border-color: #3b82f6;
+        background: #f0f7ff;
+        transform: translateY(-2px);
+    }
+    .method-option.active {
+        border-color: #3b82f6;
+        background: #eff6ff;
+        box-shadow: 0 4px 15px rgba(59,130,246,0.1);
+    }
+    .method-option input[type="radio"] {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        cursor: pointer;
+    }
+    .method-icon {
+        font-size: 2rem;
+        color: #3b82f6;
+        margin-bottom: 12px;
+    }
+    .method-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+    .method-desc {
+        font-size: 0.8rem;
+        color: #64748b;
+        line-height: 1.4;
+    }
+    .payment-action {
+        text-align: center;
+    }
+    .btn-pay {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 16px 40px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 750;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+    }
+    .btn-pay:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59,130,246,0.4);
+    }
+    /* Bank Transfer Box */
+    .bank-transfer-box {
+        display: none;
+        background: #fff;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        text-align: center;
+        animation: fadeIn 0.4s ease;
+    }
+    .qr-img {
+        max-width: 250px;
+        margin: 15px auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 10px;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .bank-details {
+        margin-top: 15px;
+        font-size: 0.92rem;
+        color: #334155;
+        line-height: 1.6;
+    }
+    .bank-details strong {
+        color: #1e293b;
+    }
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="payment-header">
+            <h2>Hóa đơn thanh toán</h2>
+            <p>Mã hóa đơn: #@(bookingType == "Tour" ? "T" : "H")@bookingId · Trạng thái: Chờ thanh toán</p>
+        </div>
+        <div class="payment-body">
+            <!-- Details summary -->
+            <div class="summary-section">
+                <div class="summary-row">
+                    <span>Loại dịch vụ:</span>
+                    <strong style="color:#1e293b;">@(bookingType == "Tour" ? "Đặt Tour Du Lịch" : "Đặt Phòng Khách Sạn")</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Tên dịch vụ:</span>
+                    <strong style="color:#1e293b;">@itemName</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Mã đơn đặt:</span>
+                    <strong>#@bookingId</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Tổng số tiền:</span>
+                    <span class="summary-total">@totalPrice.ToString("N0") VND</span>
+                </div>
+            </div>
+
+            <h3 style="font-size:1.15rem; font-weight:700; color:#1e293b; margin-bottom:20px;">Chọn phương thức thanh toán:</h3>
+            
+            <form action="/Booking/ProcessPayment" method="post" id="payment-form">
+                <input type="hidden" name="bookingType" value="@bookingType" />
+                <input type="hidden" name="bookingId" value="@bookingId" />
+
+                <div class="method-selector">
+                    <!-- COD -->
+                    <div class="method-option active" onclick="selectMethod('COD')">
+                        <input type="radio" name="paymentMethod" id="method-COD" value="COD" checked />
+                        <div class="method-icon"><i class="fa fa-money"></i></div>
+                        <div class="method-title">Tiền mặt / COD</div>
+                        <div class="method-desc">Thanh toán trực tiếp bằng tiền mặt khi nhận dịch vụ.</div>
+                    </div>
+
+                    <!-- Bank Transfer -->
+                    <div class="method-option" onclick="selectMethod('BankTransfer')">
+                        <input type="radio" name="paymentMethod" id="method-BankTransfer" value="BankTransfer" />
+                        <div class="method-icon"><i class="fa fa-qrcode"></i></div>
+                        <div class="method-title">Chuyển khoản QR</div>
+                        <div class="method-desc">Quét mã QR để chuyển khoản nhanh qua ứng dụng ngân hàng.</div>
+                    </div>
+
+                    <!-- VNPay -->
+                    <div class="method-option" onclick="selectMethod('VNPay')">
+                        <input type="radio" name="paymentMethod" id="method-VNPay" value="VNPay" />
+                        <div class="method-icon"><i class="fa fa-credit-card"></i></div>
+                        <div class="method-title">VNPAY Cổng Test</div>
+                        <div class="method-desc">Kết nối cổng thanh toán VNPAY Sandbox để kiểm tra.</div>
+                    </div>
+                </div>
+
+                <!-- Bank transfer detail panel -->
+                <div class="bank-transfer-box" id="bank-transfer-details">
+                    <h4 style="font-size:1.05rem; font-weight:700; color:#0f172a; margin-bottom:10px;">Quét mã VietQR chuyển khoản nhanh</h4>
+                    @{
+                        // MB Bank VietQR API generator link
+                        string qrUrl = $"https://img.vietqr.io/image/mbbank-0901234567-print.png?amount={totalPrice:0}&addInfo=Payment_{bookingType}_{bookingId}&accountName=TravelVietnam";
+                    }
+                    <img src="@qrUrl" alt="VietQR VietinBank Transfer" class="qr-img" />
+                    <div class="bank-details">
+                        <p>Ngân hàng: <strong>MB BANK (Ngân hàng Quân Đội)</strong></p>
+                        <p>Số tài khoản: <strong>0901234567</strong></p>
+                        <p>Chủ tài khoản: <strong>TRAVEL VIETNAM CO. LTD</strong></p>
+                        <p>Nội dung chuyển khoản: <strong>Payment @bookingType @bookingId</strong></p>
+                        <p style="font-size:0.8rem; color:#ef4444; margin-top:8px; font-style:italic;">* Hệ thống sẽ tự động cập nhật trạng thái "Đã thanh toán" ngay khi bạn bấm xác nhận bên dưới.</p>
+                    </div>
+                </div>
+
+                <div class="payment-action">
+                    <button type="submit" class="btn-pay" id="btn-submit-payment">Xác nhận Thanh toán</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectMethod(methodName) {
+        // Deselect all
+        document.querySelectorAll('.method-option').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // Check radio button
+        const radio = document.getElementById('method-' + methodName);
+        if (radio) {
+            radio.checked = true;
+        }
+
+        // Active option styling
+        radio.closest('.method-option').classList.add('active');
+
+        // Show/hide bank transfer panel
+        const bankBox = document.getElementById('bank-transfer-details');
+        if (methodName === 'BankTransfer') {
+            bankBox.style.display = 'block';
+        } else {
+            bankBox.style.display = 'none';
+        }
+
+        // Update button text
+        const btn = document.getElementById('btn-submit-payment');
+        if (methodName === 'VNPay') {
+            btn.innerHTML = 'Thanh toán qua VNPAY <i class="fa fa-chevron-right" style="margin-left:6px;"></i>';
+        } else {
+            btn.innerHTML = 'Xác nhận Thanh toán';
+        }
+    }
+
+    document.getElementById('payment-form').addEventListener('submit', function() {
+        const btn = document.getElementById('btn-submit-payment');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Đang xử lý...';
+        }
+    });
+</script>

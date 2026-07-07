@@ -1,0 +1,47 @@
+@{
+    Layout = "_AdminLayout";
+}
+@model List<TravelProject.Models.Destination>
+
+@{
+    ViewData["Title"] = "Destinations";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Destinations</h2>
+        <a href="/Destination/Create" class="btn btn-success">+ Add New</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Region</th>
+                <th>Category</th>
+                <th>Address</th>
+                <th>Views</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.DestinationID</td>
+                    <td>@item.Name</td>
+                    <td>@item.Region</td>
+                    <td>@item.Category</td>
+                    <td>@item.Address</td>
+                    <td>@item.ViewCount</td>
+                    <td>
+                        <a href="/Destination/Details/@item.DestinationID" class="btn btn-info btn-sm">Details</a>
+                        <a href="/Destination/Edit/@item.DestinationID" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="/Destination/Delete/@item.DestinationID" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,71 @@
+@model List<TravelProject.Models.Favorite>
+@{
+    ViewData["Title"] = "Địa điểm yêu thích";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+  <h3 class="font-weight-bold mb-4 text-dark">
+    Your favorite places
+</h3>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fa fa-heart-o fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">You don't have any favorite places yet.</h5>
+            <a href="/Home/Index" class="btn btn-primary mt-2"><i class="fas fa-compass me-1"></i>Explore now</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var fav in Model)
+            {
+                var d = fav.Destination!;
+                <div class="col-md-4 col-lg-3" id="fav-@d.DestinationID">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@(string.IsNullOrEmpty(d.ImageUrl) ? "/images/default.jpg" : d.ImageUrl)"
+                             class="card-img-top" style="height:180px;object-fit:cover"
+                             onerror="this.src='/images/default.jpg'" alt="@d.Name">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-1">@d.Category</span>
+                            <h6 class="card-title fw-bold">@d.Name</h6>
+                            <p class="card-text text-muted small"><i class="fa fa-map-marker-alt mr-1"></i>@d.Region</p>
+                        </div>
+                        <div class="card-footer bg-white d-flex gap-2">
+                            <a href="/Home/DestinationDetail/@d.DestinationID" class="btn btn-sm btn-outline-primary flex-grow-1">
+                                <i class="fa fa-eye mr-1"></i>View
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFavorite(@d.DestinationID)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+function removeFavorite(destId) {
+    if (!confirm('Xoá khỏi danh sách yêu thích?')) return;
+    fetch('/Favorite/Toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest' },
+        body: 'destinationId=' + destId
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const el = document.getElementById('fav-' + destId);
+            el.style.transition = 'opacity 0.3s';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 300);
+        }
+    });
+}
+</script>
+}

@@ -1,0 +1,86 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row">
+    <!-- Quick Stats -->
+    <div class="col-md-3">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>@ViewBag.TotalDestinations</h3>
+                <p>Destinations</p>
+            </div>
+            <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+            <a href="/Destination/Index" class="small-box-footer">View more <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>@ViewBag.TotalUsers</h3>
+                <p>Users</p>
+            </div>
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <a href="/User/Index" class="small-box-footer">View more <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>@ViewBag.TotalTours</h3>
+                <p>Tours</p>
+            </div>
+            <div class="icon"><i class="fas fa-route"></i></div>
+            <a href="/TourAdmin/Index" class="small-box-footer">View more <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>@ViewBag.TotalBookings</h3>
+                <p>Pending Bookings</p>
+            </div>
+            <div class="icon"><i class="fas fa-calendar-check"></i></div>
+            <a href="/Admin/ManageBookings" class="small-box-footer">View more <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Recently Added Destinations</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Region</th>
+                            <th>Category</th>
+                            <th>Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.RecentDestinations != null)
+                        {
+                            foreach (var d in ViewBag.RecentDestinations)
+                            {
+                                <tr>
+                                    <td>@d.DestinationID</td>
+                                    <td>@d.Name</td>
+                                    <td>@d.Region</td>
+                                    <td>@d.Category</td>
+                                    <td>@d.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

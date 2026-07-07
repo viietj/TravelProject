@@ -1,0 +1,360 @@
+@model TravelProject.Models.FoodBlog
+@{
+    ViewData["Title"] = Model.Title;
+    string apiKey = "AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s";
+    bool isLoggedIn = Context.Session.GetInt32("UserID") != null;
+
+    string SeasonIcon(string s) => s switch {
+        "Spring" => "🌸", "Summer" => "☀️", "Autumn" => "🍂", "Winter" => "❄️", _ => "🍽️"
+    };
+
+    double RatingAvg(TravelProject.Models.FoodRestaurant r)
+        => r.Reviews.Any() ? r.Reviews.Average(x => x.Rating) : 0;
+}
+
+<!-- HERO -->
+<section class="hero-wrap hero-wrap-2 js-fullheight"
+         style="background-image: url('@(Model.ImageUrl ?? "/images/bg_1.jpg")');">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
+            <div class="col-md-9 ftco-animate pb-5 text-center">
+                <p class="breadcrumbs">
+                    <span class="mr-2"><a asp-controller="Home" asp-action="Index">Home <i class="fa fa-chevron-right"></i></a></span>
+                    <span class="mr-2"><a asp-controller="FoodBlog" asp-action="Index">Food Blog <i class="fa fa-chevron-right"></i></a></span>
+                    <span>@Model.Title</span>
+                </p>
+                <span class="badge badge-warning text-dark px-3 py-2 mr-2" style="font-size:1rem;">
+                    @SeasonIcon(Model.Season) @Model.Season
+                </span>
+                <span class="badge badge-danger px-3 py-2" style="font-size:1rem;">
+                    @Model.Region Vietnam
+                </span>
+                <h1 class="mb-0 bread mt-3">@Model.Title</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ARTICLE CONTENT -->
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-9">
+                <div class="p-4 mb-5" style="background:#fff; border-radius:12px; box-shadow:0 2px 16px rgba(0,0,0,.08);">
+                    <p class="lead text-muted border-bottom pb-3">@Model.Description</p>
+                    <div style="line-height:1.9; font-size:1.05rem; white-space:pre-line;">@Model.Content</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- RECOMMENDED RESTAURANTS -->
+@if (Model.Restaurants.Any())
+{
+    <section class="ftco-section ftco-no-pt" style="background:#fdf6ee;">
+        <div class="container">
+            <div class="row justify-content-center mb-5">
+                <div class="col-md-8 text-center ftco-animate">
+                    <span class="subheading">Where to eat</span>
+                    <h2 class="mb-2">🍜 Recommended Restaurants</h2>
+                    <p class="text-muted">Hand-picked dining spots near this culinary destination</p>
+                </div>
+            </div>
+
+            @foreach (var restaurant in Model.Restaurants)
+            {
+                double avgRating = RatingAvg(restaurant);
+                int fullStars = (int)Math.Floor(avgRating);
+                bool halfStar = (avgRating - fullStars) >= 0.5;
+                int reviewCount = restaurant.Reviews.Count;
+
+                <div class="row mb-5 ftco-animate align-items-stretch">
+
+                    <!-- Restaurant image -->
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div style="background-image: url('@(restaurant.ImageUrl ?? "/images/image_1.jpg")');
+                                    height:100%; min-height:280px; border-radius:16px;
+                                    background-size:cover; background-position:center;
+                                    box-shadow:0 4px 20px rgba(0,0,0,0.12);">
+                        </div>
+                    </div>
+
+                    <!-- Info + Reviews -->
+                    <div class="col-md-8 d-flex flex-column gap-3">
+
+                        <!-- Info card -->
+                        <div class="p-4 bg-white rounded-3" style="box-shadow:0 2px 12px rgba(0,0,0,.06); flex:1;">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                                <h4 class="mb-0 fw-bold">@restaurant.Name</h4>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    @if (!string.IsNullOrEmpty(restaurant.PriceRange))
+                                    {
+                                        <span class="badge text-dark fw-semibold px-3 py-2"
+                                              style="background:#fff3cd; border:1px solid #ffc107; font-size:0.82rem;">
+                                            💰 @restaurant.PriceRange
+                                        </span>
+                                    }
+                                    <span class="badge px-3 py-2"
+                                          style="background:@(avgRating >= 4 ? "#d1fae5" : avgRating >= 3 ? "#fef9c3" : "#fee2e2");
+                                                 color:@(avgRating >= 4 ? "#065f46" : avgRating >= 3 ? "#92400e" : "#991b1b");
+                                                 border:1px solid @(avgRating >= 4 ? "#6ee7b7" : avgRating >= 3 ? "#fcd34d" : "#fca5a5");
+                                                 font-size:0.82rem;">
+                                        ⭐ @avgRating.ToString("F1") / 5
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Stars -->
+                            <div class="mb-3">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= fullStars)
+                                    { <i class="fa fa-star text-warning"></i> }
+                                    else if (i == fullStars + 1 && halfStar)
+                                    { <i class="fa fa-star-half-o text-warning"></i> }
+                                    else
+                                    { <i class="fa fa-star-o text-warning"></i> }
+                                }
+                                <span class="ms-2 text-muted small">
+                                    @(reviewCount > 0 ? $"{reviewCount} review{(reviewCount > 1 ? "s" : "")}" : "No reviews yet")
+                                </span>
+                            </div>
+
+                            <!-- Contact info -->
+                            <div class="d-flex flex-column gap-2">
+                                <div>
+                                    <i class="fa fa-map-marker text-danger me-2"></i>
+                                    <span class="small">@restaurant.Address</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(restaurant.PhoneNumber))
+                                {
+                                    <div>
+                                        <i class="fa fa-phone text-primary me-2"></i>
+                                        <span class="small">@restaurant.PhoneNumber</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Map toggle button -->
+                            <div class="mt-3">
+                                <button class="btn btn-outline-primary btn-sm"
+                                        onclick="toggleMap(@restaurant.RestaurantID, @restaurant.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture), @restaurant.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture), '@restaurant.Name', '@restaurant.Address')">
+                                    <i class="fa fa-map mr-1"></i> View on Map
+                                </button>
+                            </div>
+
+                            <div id="map-@restaurant.RestaurantID"
+                                 style="height:260px; border-radius:10px; margin-top:12px; display:none;">
+                            </div>
+                        </div>
+
+                        <!-- Reviews card -->
+                        <div class="p-4 bg-white rounded-3" style="box-shadow:0 2px 12px rgba(0,0,0,.06);">
+                            <h6 class="mb-3 fw-bold">
+                                💬 Guest Reviews
+                                @if (reviewCount > 0)
+                                {
+                                    <span class="badge bg-primary ms-2" style="font-size:0.75rem;">@reviewCount</span>
+                                }
+                            </h6>
+
+                            @if (restaurant.Reviews.Any())
+                            {
+                                <div style="max-height:260px; overflow-y:auto;">
+                                    @foreach (var review in restaurant.Reviews.OrderByDescending(r => r.CreatedDate))
+                                    {
+                                        <div class="mb-3 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                                         style="width:32px; height:32px; font-size:0.75rem;
+                                                                background:linear-gradient(135deg,#667eea,#764ba2);">
+                                                        @review.UserName.Substring(0, 1).ToUpper()
+                                                    </div>
+                                                    <div>
+                                                        <strong class="small">@review.UserName</strong>
+                                                        <div class="text-muted" style="font-size:0.72rem;">
+                                                            @review.CreatedDate.ToString("dd MMM yyyy")
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="fa @(i <= review.Rating ? "fa-star" : "fa-star-o") text-warning"
+                                                           style="font-size:0.78rem;"></i>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <p class="mb-0 mt-2 text-muted small">@review.Comment</p>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted small mb-3">
+                                    No reviews yet. Be the first to share your experience!
+                                </p>
+                            }
+
+                            <!-- Review form (logged-in only) -->
+                            @if (isLoggedIn)
+                            {
+                                <div class="mt-3 pt-3 border-top">
+                                    <h6 class="small fw-bold mb-2">✍️ Write a Review</h6>
+                                    <form asp-action="AddReview" method="post">
+                                        <input type="hidden" name="restaurantId" value="@restaurant.RestaurantID" />
+                                        <input type="hidden" name="blogId" value="@Model.BlogID" />
+
+                                        <div class="mb-2">
+                                            <label class="small fw-bold d-block mb-1">Your Rating</label>
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="fa fa-star-o star-btn"
+                                                   data-value="@i"
+                                                   data-group="@restaurant.RestaurantID"
+                                                   style="font-size:1.4rem; cursor:pointer; color:#ccc; margin-right:3px;"></i>
+                                            }
+                                            <input type="hidden" name="rating"
+                                                   id="rating-input-@restaurant.RestaurantID" value="0" />
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <textarea name="comment" class="form-control form-control-sm" rows="2"
+                                                      placeholder="Share your experience..." required></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fa fa-paper-plane mr-1"></i> Submit Review
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-light mt-3 py-2 small border mb-0">
+                                    <a asp-controller="Account" asp-action="Login">Log in</a> to write a review.
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+
+                @if (restaurant != Model.Restaurants.Last())
+                {
+                    <hr class="my-4" />
+                }
+            }
+        </div>
+    </section>
+}
+
+
+<!-- BACK LINKS -->
+<section class="ftco-section ftco-no-pt py-4">
+    <div class="container text-center">
+        <a asp-action="Index" asp-route-region="@Model.Region" class="btn btn-outline-primary mr-2">
+            More @Model.Region Vietnamese Food
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            All Food Blog Posts
+        </a>
+    </div>
+</section>
+
+<!-- SCRIPTS -->
+<script>
+    const MAPS_API_KEY = '@apiKey';
+    let mapInstances = {};
+    let mapsLoaded = false;
+    let mapsLoading = false;
+    let pendingMaps = [];
+
+    function loadGoogleMaps(callback) {
+        if (mapsLoaded) { callback(); return; }
+        pendingMaps.push(callback);
+        if (mapsLoading) return;
+        mapsLoading = true;
+        window.__gmapsReady = function () {
+            mapsLoaded = true;
+            pendingMaps.forEach(fn => fn());
+            pendingMaps = [];
+        };
+        const s = document.createElement('script');
+        s.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&callback=__gmapsReady`;
+        s.async = true;
+        document.head.appendChild(s);
+    }
+
+    function toggleMap(restaurantId, lat, lng, name, address) {
+        const mapDiv = document.getElementById('map-' + restaurantId);
+        if (mapDiv.style.display === 'none') {
+            mapDiv.style.display = 'block';
+            if (!mapInstances[restaurantId]) {
+                loadGoogleMaps(() => createMap(restaurantId, lat, lng, name, address));
+            }
+        } else {
+            mapDiv.style.display = 'none';
+        }
+    }
+
+    function createMap(restaurantId, lat, lng, name, address) {
+        const mapDiv = document.getElementById('map-' + restaurantId);
+        const map = new google.maps.Map(mapDiv, {
+            center: { lat, lng },
+            zoom: 15,
+            mapTypeControl: false,
+            streetViewControl: false
+        });
+        const marker = new google.maps.Marker({
+            position: { lat, lng }, map,
+            title: name,
+            animation: google.maps.Animation.DROP
+        });
+        const info = new google.maps.InfoWindow({
+            content: `<div style="max-width:200px;">
+                        <strong>${name}</strong><br>
+                        <small style="color:#555;">${address}</small><br>
+                        <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank"
+                           style="color:#F96D00; font-size:0.85rem;">Get Directions ↗</a>
+                      </div>`
+        });
+        info.open(map, marker);
+        marker.addListener('click', () => info.open(map, marker));
+        mapInstances[restaurantId] = map;
+    }
+
+    // Star rating interaction
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.star-btn').forEach(function (star) {
+            star.addEventListener('mouseover', function () {
+                const group = this.dataset.group;
+                const val = parseInt(this.dataset.value);
+                document.querySelectorAll(`.star-btn[data-group="${group}"]`).forEach(s => {
+                    s.style.color = parseInt(s.dataset.value) <= val ? '#F96D00' : '#ccc';
+                });
+            });
+            star.addEventListener('mouseout', function () {
+                const group = this.dataset.group;
+                const selected = parseInt(document.getElementById('rating-input-' + group).value);
+                document.querySelectorAll(`.star-btn[data-group="${group}"]`).forEach(s => {
+                    s.style.color = parseInt(s.dataset.value) <= selected ? '#F96D00' : '#ccc';
+                });
+            });
+            star.addEventListener('click', function () {
+                const group = this.dataset.group;
+                const val = parseInt(this.dataset.value);
+                document.getElementById('rating-input-' + group).value = val;
+                document.querySelectorAll(`.star-btn[data-group="${group}"]`).forEach(s => {
+                    const sv = parseInt(s.dataset.value);
+                    s.className = 'fa star-btn ' + (sv <= val ? 'fa-star' : 'fa-star-o');
+                    s.style.color = sv <= val ? '#F96D00' : '#ccc';
+                });
+            });
+        });
+    });
+</script>

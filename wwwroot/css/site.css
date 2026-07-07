@@ -1,0 +1,498 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+/* ============================================
+   TOURIST FEEDBACK - Featured Layout B
+   ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Lato:wght@300;400;700&display=swap');
+
+.tf-section {
+    background: linear-gradient(135deg, #0f4c3a 0%, #1a6b5a 40%, #2d9b7a 100%);
+    padding: 70px 40px 50px;
+    font-family: 'Lato', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+.tf-section::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+.tf-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.tf-eyebrow {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+.tf-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+/* Grid 2 cột */
+.tf-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 16px;
+    max-width: 960px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* ---- Featured card lớn ---- */
+.tf-featured {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.tf-featured-body {
+    padding: 24px 26px 26px;
+}
+.tf-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #1f2937;
+    font-style: italic;
+    margin: 12px 0 16px;
+    padding-left: 18px;
+    position: relative;
+}
+.tf-quote::before {
+    content: '"';
+    position: absolute;
+    left: 0; top: -6px;
+    font-size: 44px;
+    color: #d1fae5;
+    font-family: 'Playfair Display', serif;
+    line-height: 1;
+}
+.tf-feat-img-bottom {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 8px 0 18px;
+}
+.tf-author-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.tf-author-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 2px;
+}
+.tf-author-sub {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}
+.tf-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ---- Small cards ---- */
+.tf-small-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.tf-small-card {
+    background: rgba(255,255,255,0.13);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 16px;
+    padding: 16px;
+    transition: background 0.2s, transform 0.2s;
+}
+.tf-small-card:hover {
+    background: rgba(255,255,255,0.22);
+    transform: translateY(-2px);
+}
+.tf-sm-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.tf-loc-badge {
+    font-size: 11px;
+    padding: 3px 9px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 20px;
+    color: #374151;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.tf-sm-quote {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.55;
+    margin: 0 0 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;  
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.tf-sm-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tf-sm-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+}
+.tf-avatar-sm {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ---- Stats box ---- */
+.tf-stats-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    text-align: center;
+}
+.tf-stat-val {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Playfair Display', serif;
+    line-height: 1.1;
+}
+.tf-stat-label {
+    display: block;
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+}
+
+/* ============================================
+   COMMENT SECTION
+   ============================================ */
+.comments-section {
+    padding: 50px 40px;
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: 'Lato', sans-serif;
+}
+.cs-header { margin-bottom: 28px; }
+.cs-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Comment card */
+.cs-comment {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s;
+}
+.cs-comment:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.cs-reply {
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 10px;
+}
+.cs-replies {
+    margin-top: 12px;
+    padding-left: 16px;
+    border-left: 2px solid #e5e7eb;
+}
+.cs-comment-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.cs-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.cs-comment-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.cs-username {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+.cs-date {
+    font-size: 12px;
+    color: #9ca3af;
+}
+.cs-admin-badge {
+    font-size: 11px;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+.cs-stars { margin-bottom: 6px; }
+.cs-comment-text {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.65;
+    margin: 6px 0 10px;
+}
+.cs-comment-img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+/* Actions: like + reply */
+.cs-comment-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+.cs-like-btn, .cs-reply-toggle {
+    background: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.cs-like-btn:hover    { border-color: #f87171; color: #ef4444; }
+.cs-like-btn.liked    { background: #fef2f2; border-color: #ef4444; color: #ef4444; }
+.cs-reply-toggle:hover { border-color: #1a6b5a; color: #1a6b5a; }
+
+/* Reply form */
+.cs-reply-form { margin-top: 12px; }
+.cs-reply-textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+    resize: none;
+    min-height: 72px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.cs-reply-textarea:focus { border-color: #1a6b5a; }
+.cs-reply-submit {
+    margin-top: 8px;
+    background: #0f4c3a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.cs-reply-submit:hover { background: #1a6b5a; }
+
+/* Phân trang */
+.cs-pagination {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 24px 0 32px;
+}
+.cs-page-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Lato', sans-serif;
+}
+.cs-page-btn:hover:not(.active) {
+    border-color: #1a6b5a;
+    color: #1a6b5a;
+}
+.cs-page-btn.active {
+    background: #0f4c3a;
+    color: #fff;
+    border-color: #0f4c3a;
+}
+
+/* Add comment form */
+.cs-add-comment {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 28px;
+    margin-top: 32px;
+}
+.cs-add-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 18px;
+}
+.cs-star-picker {
+    font-size: 30px;
+    color: #d1d5db;
+    cursor: pointer;
+    margin-bottom: 14px;
+    letter-spacing: 4px;
+    user-select: none;
+}
+.cs-textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+.cs-textarea:focus { border-color: #1a6b5a; }
+.cs-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1.5px dashed #9ca3af;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 14px;
+    transition: border-color 0.2s, color 0.2s;
+}
+.cs-upload-btn:hover { border-color: #1a6b5a; color: #1a6b5a; }
+.cs-submit-btn {
+    display: inline-block;
+    background: #0f4c3a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 30px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    transition: background 0.2s;
+}
+.cs-submit-btn:hover { background: #1a6b5a; }
+.cs-login-prompt {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    margin-top: 24px;
+}
+.cs-login-prompt a {
+    color: #0f4c3a;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .tf-grid { grid-template-columns: 1fr; }
+    .tf-section { padding: 50px 20px; }
+    .tf-title { font-size: 26px; }
+    .comments-section { padding: 30px 16px; }
+}

@@ -1,0 +1,584 @@
+@{
+    Layout = null;
+    ViewData["Title"] = "Home";
+}
+@model List<TravelProject.Models.Destination>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Pacific - Free Bootstrap 4 Template by Colorlib</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Arizonia&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="css/animate.css">
+	
+	<link rel="stylesheet" href="css/owl.carousel.min.css">
+	<link rel="stylesheet" href="css/owl.theme.default.min.css">
+	<link rel="stylesheet" href="css/magnific-popup.css">
+
+	<link rel="stylesheet" href="css/bootstrap-datepicker.css">
+	<link rel="stylesheet" href="css/jquery.timepicker.css">
+
+	
+	<link rel="stylesheet" href="css/flaticon.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+			<a class="navbar-brand" href="index.html">Pacific<span>Travel Agency</span></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="oi oi-menu"></span> Menu
+			</button>
+
+			<div class="collapse navbar-collapse" id="ftco-nav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item active"><a href="/" class="nav-link">Home</a></li>
+					<li class="nav-item"><a asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
+					<li class="nav-item"><a asp-controller="Home" asp-action="Destinations" class="nav-link">Destinations</a></li>
+					<li class="nav-item"><a asp-controller="Hotel" asp-action="Index" class="nav-link">Hotels</a></li>
+					<li class="nav-item"><a asp-controller="FoodBlog" asp-action="Index" class="nav-link">Blog</a></li>
+					<li class="nav-item"><a href="/Booking/MyBookings" class="nav-link">My Bookings</a></li>
+					<li class="nav-item"><a asp-controller="Favorite" asp-action="Index" class="nav-link">Favorites</a></li>
+					@if (Context.Session.GetString("Username") != null)
+					{
+						<li class="nav-item">
+							<a href="#" class="nav-link">
+								<span class="fa fa-user mr-1"></span>
+								@Context.Session.GetString("Username")
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="/Account/Logout" class="nav-link">Logout</a>
+						</li>
+					}
+					else
+					{
+						<li class="nav-item">
+							<a href="/Account/Login" class="nav-link">Login</a>
+						</li>
+						<li class="nav-item">
+							<a href="/Account/Register" class="nav-link">Register</a>
+						</li>
+					}
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+	
+	<div class="hero-wrap js-fullheight" style="background-image: url('images/bg_5.jpg');">
+		<div class="overlay"></div>
+		<div class="container">
+			<div class="row no-gutters slider-text js-fullheight align-items-center" data-scrollax-parent="true">
+				<div class="col-md-7 ftco-animate">
+					<span class="subheading">Welcome to Viet Nam </span>
+					<h1 class="mb-4">Discover the timeless charm of Vietnam</h1>
+					<p class="caps">A country of breathtaking landscapes and soul-stirring beauty</p>
+				</div>
+				<a href="https://vimeo.com/45830194" class="icon-video popup-vimeo d-flex align-items-center justify-content-center mb-4">
+					<span class="fa fa-play"></span>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<section class="ftco-section ftco-no-pb ftco-no-pt">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="ftco-search d-flex justify-content-center">
+						<div class="row">
+							<div class="col-md-12 nav-link-wrap">
+								<div class="nav nav-pills text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+									<a class="nav-link active mr-md-1" id="v-pills-1-tab" data-toggle="pill" href="#v-pills-1" role="tab" aria-controls="v-pills-1" aria-selected="true">Search Tour</a>
+
+									<a class="nav-link" id="v-pills-2-tab" data-toggle="pill" href="#v-pills-2" role="tab" aria-controls="v-pills-2" aria-selected="false">Hotel</a>
+
+								</div>
+							</div>
+							<div class="col-md-12 tab-wrap">
+								
+								<div class="tab-content" id="v-pills-tabContent">
+
+									<div class="tab-pane fade show active" id="v-pills-1" role="tabpanel" aria-labelledby="v-pills-nextgen-tab">
+										<form action="#" class="search-property-1">
+											<div class="row no-gutters">
+												<div class="col-md d-flex">
+													<div class="form-group p-4 border-0">
+														<label for="#">Destination</label>
+														<div class="form-field">
+															<div class="icon"><span class="fa fa-search"></span></div>
+															<input type="text" class="form-control" placeholder="Search place">
+														</div>
+													</div>
+												</div>
+												<div class="col-md d-flex">
+													<div class="form-group p-4">
+														<label for="#">Check-in date</label>
+														<div class="form-field">
+															<div class="icon"><span class="fa fa-calendar"></span></div>
+															<input type="text" class="form-control checkin_date" placeholder="Check In Date">
+														</div>
+													</div>
+												</div>
+												<div class="col-md d-flex">
+													<div class="form-group p-4">
+														<label for="#">Check-out date</label>
+														<div class="form-field">
+															<div class="icon"><span class="fa fa-calendar"></span></div>
+															<input type="text" class="form-control checkout_date" placeholder="Check Out Date">
+														</div>
+													</div>
+												</div>
+												<div class="col-md d-flex">
+													<div class="form-group p-4">
+														<label for="#">Price Limit</label>
+														<div class="form-field">
+															<div class="select-wrap">
+																<div class="icon"><span class="fa fa-chevron-down"></span></div>
+																<select name="" id="" class="form-control">
+																	<option value="">$100</option>
+																	<option value="">$10,000</option>
+																	<option value="">$50,000</option>
+																	<option value="">$100,000</option>
+																	<option value="">$200,000</option>
+																	<option value="">$300,000</option>
+																	<option value="">$400,000</option>
+																	<option value="">$500,000</option>
+																	<option value="">$600,000</option>
+																	<option value="">$700,000</option>
+																	<option value="">$800,000</option>
+																	<option value="">$900,000</option>
+																	<option value="">$1,000,000</option>
+																	<option value="">$2,000,000</option>
+																</select>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="col-md d-flex">
+													<div class="form-group d-flex w-100 border-0">
+														<div class="form-field w-100 align-items-center d-flex">
+															<input type="submit" value="Search" class="align-self-stretch form-control btn btn-primary">
+														</div>
+													</div>
+												</div>
+											</div>
+										</form>
+									</div>
+
+									<div class="tab-pane fade" id="v-pills-2" role="tabpanel" aria-labelledby="v-pills-performance-tab">
+										<form action="#" class="search-property-1">
+											<div class="row no-gutters">
+												<div class="col-lg d-flex">
+													<div class="form-group p-4 border-0">
+														<label for="#">Destination</label>
+														<div class="form-field">
+															<div class="icon"><span class="fa fa-search"></span></div>
+															<input type="text" class="form-control" placeholder="Search place">
+														</div>
+													</div>
+												</div>
+												<div class="col-lg d-flex">
+													<div class="form-group p-4">
+														<label for="#">Check-in date</label>
+														<div class="form-field">
+															<div class="icon"><span class="fa fa-calendar"></span></div>
+															<input type="text" class="form-control checkin_date" placeholder="Check In Date">
+														</div>
+													</div>
+												</div>
+												<div class="col-lg d-flex">
+													<div class="form-group p-4">
+														<label for="#">Check-out date</label>
+														<div class="form-field">
+															<div class="icon"><span class="fa fa-calendar"></span></div>
+															<input type="text" class="form-control checkout_date" placeholder="Check Out Date">
+														</div>
+													</div>
+												</div>
+												<div class="col-lg d-flex">
+													<div class="form-group p-4">
+														<label for="#">Price Limit</label>
+														<div class="form-field">
+															<div class="select-wrap">
+																<div class="icon"><span class="fa fa-chevron-down"></span></div>
+																<select name="" id="" class="form-control">
+																	<option value="">$100</option>
+																	<option value="">$10,000</option>
+																	<option value="">$50,000</option>
+																	<option value="">$100,000</option>
+																	<option value="">$200,000</option>
+																	<option value="">$300,000</option>
+																	<option value="">$400,000</option>
+																	<option value="">$500,000</option>
+																	<option value="">$600,000</option>
+																	<option value="">$700,000</option>
+																	<option value="">$800,000</option>
+																	<option value="">$900,000</option>
+																	<option value="">$1,000,000</option>
+																	<option value="">$2,000,000</option>
+																</select>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="col-lg d-flex">
+													<div class="form-group d-flex w-100 border-0">
+														<div class="form-field w-100 align-items-center d-flex">
+															<input type="submit" value="Search" class="align-self-stretch form-control btn btn-primary p-0">
+														</div>
+													</div>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-section services-section">
+			<div class="container">
+				<div class="row d-flex">
+					<div class="col-md-6 order-md-last heading-section pl-md-5 ftco-animate d-flex align-items-center">
+						<div class="w-100">
+							<span class="subheading">Welcome to Viet Nam </span>
+							<h2 class="mb-4">It's time to start your adventure</h2>
+							<p>Located in the heart of Southeast Asia, Vietnam is a country of immense natural beauty and a resilient history that spans thousands of years. From the majestic mountains in the North to the fertile plains of the Mekong Delta, its diverse geography offers breathtaking landscapes at every turn. Deeply rooted in Confucian values, Vietnamese culture is a beautiful blend of ancient traditions and modern vitality, characterized by the legendary hospitality of its people. Above all, Vietnam is a paradise for food lovers, famous worldwide for its exquisite cuisine that perfectly balances fresh ingredients, aromatic herbs, and bold flavors like Pho or Banh Mi.</p>
+							
+							<p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="row">
+							<div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">
+								<div class="services services-1 color-1 d-block img" style="background-image: url(images/services-1.jpg);">
+									<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-paragliding"></span></div>
+									<div class="media-body">
+										<h3 class="heading mb-3">Culture</h3>
+										<p>With 54 distinct ethnic groups, Vietnam offers a rich cultural mosaic characterized by colorful traditions, unique heritage, and the legendary hospitality of its people.</p>
+									</div>
+								</div>      
+							</div>
+							<div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">
+								<div class="services services-1 color-2 d-block img" style="background-image: url(images/services-2.jpg);">
+									<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-route"></span></div>
+									<div class="media-body">
+										<h3 class="heading mb-3">Cuisine</h3>
+										<p>Vietnamese cuisine is a captivating journey of flavors, where every dish balances five fundamental tastes: spicy, sour, bitter, salty, and sweet.</p>
+										<p>From the iconic Pho to the world-renowned Banh Mi, each bite tells a story of our rich heritage and the legendary hospitality of our people</p>
+									</div>
+								</div>    
+							</div>
+							<div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">
+								<div class="services services-1 color-3 d-block img" style="background-image: url(images/services-3.jpg);">
+									<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-tour-guide"></span></div>
+									<div class="media-body">
+										<h3 class="heading mb-3">Historical Relics</h3>
+										<p>Vietnam is home to numerous historical relics that stand as silent witnesses to the country's thousand-year journey of building and defending the nation.</p> 
+										<p>From the ancient Imperial Citadel of Thang Long to the heroic remnants of the Cu Chi Tunnels, each site tells a story of resilience, sacrifice, and cultural brilliance. These sacred landmarks are not only architectural wonders but also the soul of the nation, where visitors can deeply connect with the glorious past and the indomitable spirit of the Vietnamese people</p>
+									</div>
+								</div>      
+							</div>
+							<div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">
+								<div class="services services-1 color-4 d-block img" style="background-image: url(images/services-4.jpg);">
+									<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-map"></span></div>
+									<div class="media-body">
+										<h3 class="heading mb-3">Authentic Cultural Encounters</h3>
+										<p>Step into the soul of our villages through traditional folk games. Whether it’s the rhythmic grace of the Bamboo Dance (Nhảy Sạp) or the strategic fun of Mandarin Square Capturing (Ô Ăn Quan), these centuries-old activities offer a unique window into our vibrant community spirit. It’s not just a game—it’s a connection to our ancestors' joy</p>
+									</div>
+								</div>      
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-section img ftco-select-destination" style="background-image: url(images/bg_3.jpg);">
+			<div class="container">
+				<div class="row justify-content-center pb-4">
+					<div class="col-md-12 heading-section text-center ftco-animate">
+						<span class="subheading">Pacific Provide Places</span>
+						<h2 class="mb-4">Select Your Destination</h2>
+					</div>
+				</div>
+			</div>
+			<div class="container container-2">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="carousel-destination owl-carousel ftco-animate">
+							@foreach (var item in Model)
+							{
+								<div class="item">
+									<div class="project-destination">
+										<a href="/Home/DestinationDetail/@item.DestinationID"
+										class="img"
+										style="background-image: url('@(item.ImageUrl ?? "images/place-1.jpg")');">
+											<div class="text">
+												<h3>@item.Name</h3>
+												<span>@item.Region</span>
+											</div>
+										</a>
+									</div>
+								</div>
+							}
+						</div>
+							<div class="item">
+								<div class="project-destination">
+									<a href="#" class="img" style="background-image: url(images/place-2.jpg);">
+										<div class="text">
+											<h3>Phu Quoc island</h3>
+											<span>2 Tours</span>
+										</div>
+									</a>
+								</div>
+							</div>
+							<div class="item">
+								<div class="project-destination">
+									<a href="#" class="img" style="background-image: url(images/place-3.jpg);">
+										<div class="text">
+											<h3>Ha Long Bay</h3>
+											<span>5 Tours</span>
+										</div>
+									</a>
+								</div>
+							</div>
+							<div class="item">
+								<div class="project-destination">
+									<a href="#" class="img" style="background-image: url(images/place-4.jpg);">
+										<div class="text">
+											<h3>Da Nang City</h3>
+											<span>5 Tours</span>
+										</div>
+									</a>
+								</div>
+							</div>
+							<div class="item">
+								<div class="project-destination">
+									<a href="#" class="img" style="background-image: url(images/place-5.jpg);">
+										<div class="text">
+											<h3>Nha Trang province</h3>
+											<span>7 Tours</span>
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-section">
+			<div class="container">
+				<div class="row justify-content-center pb-4">
+					<div class="col-md-12 heading-section text-center ftco-animate">
+						<span class="subheading">Destination</span>
+						<h2 class="mb-4">Tour Destination</h2>
+					</div>
+				</div>
+				<div class="row">
+					
+		@foreach (var item in ViewBag.Tours)
+{
+    <div class="col-md-4 ftco-animate">
+
+        <div class="project-wrap">
+
+            <a href="/Tour/Detail/@item.TourID"
+               class="img"
+               style="background-image:url('@item.ImageUrl')">
+
+                <span class="price">
+                    @item.PricePerPerson.ToString("N0") VND/person
+                </span>
+            </a>
+
+            <div class="text p-4">
+
+                <span class="days">
+                    @item.DurationDays Days Tour
+                </span>
+
+                <h3>
+                    <a href="/Tour/Detail/@item.TourID">@item.Title</a>
+                </h3>
+
+                <p class="location">
+                    <span class="fa fa-map-marker"></span>
+                    @item.Region
+                </p>
+
+            </div>
+        </div>
+    </div>
+}
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-section">
+			<div class="container">
+				<div class="row justify-content-center pb-4">
+					<div class="col-md-12 heading-section text-center ftco-animate">
+						<span class="subheading">Our Blog</span>
+						<h2 class="mb-4">Recent Post</h2>
+					</div>
+				</div>
+				<div class="row d-flex">
+					@if (ViewBag.Blogs != null)
+					{
+						foreach (var blog in (List<TravelProject.Models.FoodBlog>)ViewBag.Blogs)
+						{
+							<div class="col-md-4 d-flex ftco-animate mb-4">
+								<div class="blog-entry justify-content-end w-100">
+									<a href="/FoodBlog/Detail/@blog.BlogID" class="block-20" style="background-image: url('@(blog.ImageUrl ?? "images/image_1.jpg")');">
+									</a>
+									<div class="text">
+										<div class="d-flex align-items-center mb-4 topp">
+											<div class="one">
+												<span class="day">@blog.CreatedDate.Day</span>
+											</div>
+											<div class="two">
+												<span class="yr">@blog.CreatedDate.Year</span>
+												<span class="mos">@blog.CreatedDate.ToString("MMMM")</span>
+											</div>
+										</div>
+										<h3 class="heading"><a href="/FoodBlog/Detail/@blog.BlogID">@blog.Title</a></h3>
+										<p class="text-muted" style="font-size:0.9rem;">@blog.Description</p>
+										<p><a href="/FoodBlog/Detail/@blog.BlogID" class="btn btn-primary">Read more</a></p>
+									</div>
+								</div>
+							</div>
+						}
+					}
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-intro ftco-section ftco-no-pt">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-md-12 text-center">
+						<div class="img"  style="background-image: url(images/bg_2.jpg);">
+							<div class="overlay"></div>
+							<h2>We Are Pacific A Travel Agency</h2>
+							<p>We can manage your dream building A small river named Duden flows by their place</p>
+							<p class="mb-0"><a href="#" class="btn btn-primary px-4 py-3">Ask For A Quote</a></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="ftco-section ftco-no-pt ftco-no-pb">
+			<div class="container-fluid px-0">
+				<div class="row no-gutters">
+					<div class="col-md-12">
+						<div id="map" class="map"></div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<footer class="ftco-footer bg-bottom ftco-no-pt" style="background-image: url(images/bg_3.jpg);">
+			<div class="container">
+				<div class="row mb-5">
+					<div class="col-md pt-5">
+						<div class="ftco-footer-widget pt-md-5 mb-4">
+							<h2 class="ftco-heading-2">About</h2>
+							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+							<ul class="ftco-footer-social list-unstyled float-md-left float-lft">
+								<li class="ftco-animate"><a href="#"><span class="fa fa-twitter"></span></a></li>
+								<li class="ftco-animate"><a href="#"><span class="fa fa-facebook"></span></a></li>
+								<li class="ftco-animate"><a href="#"><span class="fa fa-instagram"></span></a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md pt-5 border-left">
+						<div class="ftco-footer-widget pt-md-5 mb-4 ml-md-5">
+							<h2 class="ftco-heading-2">Infromation</h2>
+							<ul class="list-unstyled">
+								<li><a href="#" class="py-2 d-block">Online Enquiry</a></li>
+								<li><a href="#" class="py-2 d-block">General Enquiries</a></li>
+								<li><a href="#" class="py-2 d-block">Booking Conditions</a></li>
+								<li><a href="#" class="py-2 d-block">Privacy and Policy</a></li>
+								<li><a href="#" class="py-2 d-block">Refund Policy</a></li>
+								<li><a href="#" class="py-2 d-block">Call Us</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md pt-5 border-left">
+						<div class="ftco-footer-widget pt-md-5 mb-4">
+							<h2 class="ftco-heading-2">Experience</h2>
+							<ul class="list-unstyled">
+								<li><a href="#" class="py-2 d-block">Adventure</a></li>
+								<li><a href="#" class="py-2 d-block">Hotel and Restaurant</a></li>
+								<li><a href="#" class="py-2 d-block">Beach</a></li>
+								<li><a href="#" class="py-2 d-block">Nature</a></li>
+								<li><a href="#" class="py-2 d-block">Camping</a></li>
+								<li><a href="#" class="py-2 d-block">Party</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="col-md pt-5 border-left">
+						<div class="ftco-footer-widget pt-md-5 mb-4">
+							<h2 class="ftco-heading-2">Have a Questions?</h2>
+							<div class="block-23 mb-3">
+								<ul>
+									<li><span class="icon fa fa-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>
+									<li><a href="#"><span class="icon fa fa-phone"></span><span class="text">+2 392 3929 210</span></a></li>
+									<li><a href="#"><span class="icon fa fa-paper-plane"></span><span class="text">info@yourdomain.com</span></a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12 text-center">
+
+						<p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+							Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+						</div>
+					</div>
+				</div>
+			</footer>
+			
+			
+
+			<!-- loader -->
+			<div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
+
+
+			<script src="js/jquery.min.js"></script>
+			<script src="js/jquery-migrate-3.0.1.min.js"></script>
+			<script src="js/popper.min.js"></script>
+			<script src="js/bootstrap.min.js"></script>
+			<script src="js/jquery.easing.1.3.js"></script>
+			<script src="js/jquery.waypoints.min.js"></script>
+			<script src="js/jquery.stellar.min.js"></script>
+			<script src="js/owl.carousel.min.js"></script>
+			<script src="js/jquery.magnific-popup.min.js"></script>
+			<script src="js/jquery.animateNumber.min.js"></script>
+			<script src="js/bootstrap-datepicker.js"></script>
+			<script src="js/scrollax.min.js"></script>
+			<script src="js/google-map.js"></script>
+			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&callback=initMap" async defer></script>
+			<script src="js/main.js"></script>
+			
+		</body>
+		</html>

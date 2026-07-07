@@ -1,0 +1,374 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Book Tour";
+    var tour = ViewBag.Tour as TravelProject.Models.Tour;
+}
+
+<style>
+    /* Fix transparent navbar blending with white page background */
+    #ftco-navbar {
+        background: #1a1a2e !important;
+        position: relative !important;
+        top: 0;
+    }
+    .booking-wrapper {
+        max-width: 900px;
+        margin: 30px auto 50px;
+        padding: 0 16px 60px;
+        font-family: 'Poppins', sans-serif;
+    }
+    .booking-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 30px;
+        align-items: start;
+    }
+    @@media (max-width: 768px) {
+        .booking-grid { grid-template-columns: 1fr; }
+    }
+    .booking-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        padding: 32px;
+    }
+    .booking-card h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #555;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e8e8e8;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #4f8ef7;
+    }
+    .count-control {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .count-control button {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        border: 1.5px solid #4f8ef7;
+        background: white;
+        color: #4f8ef7;
+        font-size: 1.2rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s;
+    }
+    .count-control button:hover {
+        background: #4f8ef7;
+        color: white;
+    }
+    .count-control span {
+        font-size: 1.2rem;
+        font-weight: 700;
+        min-width: 30px;
+        text-align: center;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #4f8ef7, #0d47a1);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 0.5px;
+        margin-top: 8px;
+    }
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(79,142,247,0.4);
+    }
+    /* Tour Summary Card */
+    .summary-card {
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 16px;
+        overflow: hidden;
+        color: white;
+        position: sticky;
+        top: 20px;
+    }
+    .summary-img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+    }
+    .summary-body { padding: 24px; }
+    .summary-body h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        line-height: 1.4;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.88rem;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .label { color: rgba(255,255,255,0.65); }
+    .summary-row .value { font-weight: 600; color: #fff; }
+    .slots-badge {
+        display: inline-block;
+        background: rgba(79,255,150,0.2);
+        color: #4fff96;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border: 1px solid rgba(79,255,150,0.3);
+    }
+    .total-box {
+        background: rgba(79,142,247,0.15);
+        border: 1px solid rgba(79,142,247,0.3);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 16px;
+        text-align: center;
+    }
+    .total-box .total-label { font-size: 0.82rem; color: rgba(255,255,255,0.65); }
+    .total-box .total-amount {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #ffd700;
+        margin-top: 4px;
+    }
+    .alert-error {
+        background: #fff0f0;
+        border: 1px solid #ffcdd2;
+        color: #c62828;
+        padding: 14px 18px;
+        border-radius: 10px;
+        margin-bottom: 24px;
+        font-size: 0.9rem;
+    }
+    .page-heading {
+        text-align: center;
+        margin-bottom: 36px;
+    }
+    .page-heading h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1a1a2e;
+    }
+    .page-heading p { color: #888; font-size: 0.95rem; }
+</style>
+
+<div class="booking-wrapper">
+    <div class="page-heading">
+        <h1> Book Your Tour</h1>
+        <p>Please fill out the form below to complete your booking. We will confirm it within 24 hours.</p>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-error">⚠️ @TempData["Error"]</div>
+    }
+
+    <div class="booking-grid">
+        <!-- Booking Form -->
+        <div class="booking-card">
+            <h2> Booking Information</h2>
+            <form method="post" action="/Booking/Create">
+                <input type="hidden" name="tourId" value="@tour?.TourID" />
+
+                <div class="form-group">
+                    <label>Contact Full Name</label>
+                    <input type="text" name="customerName" value="@ViewBag.CustomerName" required placeholder="Enter your full name..." />
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="customerPhone" value="@ViewBag.CustomerPhone" required placeholder="e.g., +84 901 234 567" />
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="customerEmail" value="@ViewBag.CustomerEmail" required placeholder="e.g., example@gmail.com" />
+                </div>
+
+
+                <div class="form-group">
+                    <label>Desired Departure Date</label>
+                    <input type="date" name="departureDate" id="departureDate"
+                           value="@ViewBag.DefaultDate"
+                           min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Adult Count</label>
+                    <div class="count-control">
+                        <button type="button" onclick="changeCount('adult', -1)">−</button>
+                        <span id="adultDisplay">@(ViewBag.AdultCount ?? 1)</span>
+                        <button type="button" onclick="changeCount('adult', 1)">+</button>
+                        <input type="hidden" name="adultCount" id="adultCount" value="@(ViewBag.AdultCount ?? 1)" />
+                        <small style="color:#888; font-size:0.8rem; margin-left: 10px;">@tour?.PricePerPerson.ToString("N0") VND / person</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Child Count</label>
+                    <div class="count-control">
+                        <button type="button" onclick="changeCount('child', -1)">−</button>
+                        <span id="childDisplay">@(ViewBag.ChildCount ?? 0)</span>
+                        <button type="button" onclick="changeCount('child', 1)">+</button>
+                        <input type="hidden" name="childCount" id="childCount" value="@(ViewBag.ChildCount ?? 0)" />
+                        <small style="color:#888; font-size:0.8rem; margin-left: 10px;">@tour?.PricePerChild.ToString("N0") VND / child</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Special Requests / Notes (Optional)</label>
+                    <textarea name="notes" rows="3" placeholder="e.g., dietary requirements, single room request, wheelchair access...">@ViewBag.Notes</textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="confirm-booking-btn"> Confirm Booking</button>
+            </form>
+        </div>
+
+        <!-- Tour Summary -->
+        <div class="summary-card">
+            @if (tour != null && !string.IsNullOrEmpty(tour.ImageUrl))
+            {
+                <img src="@tour.ImageUrl" alt="@tour.Title" class="summary-img" />
+            }
+            <div class="summary-body">
+                <h3>@tour?.Title</h3>
+
+                <div class="summary-row">
+                    <span class="label">⏱ Duration</span>
+                    <span class="value">@tour?.DurationDays days @tour?.DurationNights nights</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"> Departure City</span>
+                    <span class="value">@(tour?.DepartureCity ?? "—")</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"> Slots Left</span>
+                    <span class="value">
+                        <span class="slots-badge">@ViewBag.AvailableSlots slots</span>
+                    </span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"> Adult Price</span>
+                    <span class="value">@tour?.PricePerPerson.ToString("N0") VND</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label"> Child Price</span>
+                    <span class="value">@tour?.PricePerChild.ToString("N0") VND</span>
+                </div>
+
+                <div class="total-box">
+                    <div class="total-label">Estimated Total Price</div>
+                    <div class="total-amount" id="totalPrice">@tour?.PricePerPerson.ToString("N0") VND</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const priceAdult = @(tour?.PricePerPerson ?? 0);
+    const priceChild = @(tour?.PricePerChild ?? 0);
+
+    function changeCount(type, delta) {
+        const idHidden  = type === 'adult' ? 'adultCount'   : 'childCount';
+        const idDisplay = type === 'adult' ? 'adultDisplay' : 'childDisplay';
+        const minVal    = type === 'adult' ? 1 : 0;
+
+        let val = parseInt(document.getElementById(idHidden).value) + delta;
+        if (val < minVal) val = minVal;
+
+        document.getElementById(idHidden).value      = val;
+        document.getElementById(idDisplay).textContent = val;
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const adults   = parseInt(document.getElementById('adultCount').value);
+        const children = parseInt(document.getElementById('childCount').value);
+        const total    = adults * priceAdult + children * priceChild;
+        document.getElementById('totalPrice').textContent =
+            total.toLocaleString('en-US') + ' VND';
+    }
+
+    // Dynamic slot checking
+    const departureDateInput = document.getElementById('departureDate');
+    
+    function checkAvailableSlots() {
+        const selectedDate = departureDateInput.value;
+        const tourId = document.querySelector('input[name="tourId"]').value;
+        if (!selectedDate || !tourId) return;
+
+        fetch(`/Booking/GetAvailableSlots?tourId=${tourId}&date=${selectedDate}`)
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.querySelector('.slots-badge');
+                if (badge) {
+                    badge.textContent = `${data.availableSlots} slots`;
+                }
+            })
+            .catch(err => console.error("Error fetching slots:", err));
+    }
+
+    if (departureDateInput) {
+        departureDateInput.addEventListener('change', checkAvailableSlots);
+        // Initial check on load
+        if (departureDateInput.value) {
+            checkAvailableSlots();
+        }
+    }
+
+    // Prevent double submit
+    const bookingForm = document.querySelector('form[action="/Booking/Create"]');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', function() {
+            const btn = document.getElementById('confirm-booking-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="fa fa-spinner fa-spin"></span> Processing...';
+            }
+        });
+    }
+
+    // Initial total call
+    document.addEventListener('DOMContentLoaded', () => {
+        updateTotal();
+    });
+</script>
+}

@@ -1,0 +1,321 @@
+@model TravelProject.Models.Tour
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Title;
+    var related = ViewBag.RelatedTours as List<TravelProject.Models.Tour> ?? new();
+    int availableSlots = ViewBag.AvailableSlots ?? 0;
+    decimal discountPct = (Model.OriginalPrice.HasValue && Model.OriginalPrice > 0)
+        ? Math.Round((1 - Model.PricePerPerson / Model.OriginalPrice.Value) * 100)
+        : 0;
+}
+
+<style>
+    .tour-hero {
+        position: relative; height: 420px;
+        background-size: cover; background-position: center;
+        display: flex; align-items: flex-end;
+    }
+    .tour-hero .overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 100%);
+    }
+    .tour-hero-content { position: relative; z-index: 2; color: #fff; padding: 32px 40px; width: 100%; }
+    .tour-hero-content .badge-type {
+        background: #e85d24; color: #fff; font-size: 0.75rem; font-weight: 700;
+        letter-spacing: 1px; text-transform: uppercase; padding: 4px 14px;
+        border-radius: 30px; display: inline-block; margin-bottom: 12px;
+    }
+    .tour-hero-content h1 { font-size: 2.2rem; font-weight: 800; margin: 0 0 10px; line-height: 1.25; }
+    .tour-hero-content .hero-meta span { font-size: 0.9rem; margin-right: 20px; opacity: 0.9; }
+    .tour-hero-content .hero-meta .fa { margin-right: 5px; color: #e85d24; }
+    .tour-detail-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 60px; }
+    .tour-main { display: grid; grid-template-columns: 1fr 340px; gap: 36px; align-items: start; }
+    @@media (max-width: 900px) { .tour-main { grid-template-columns: 1fr; } }
+    .info-card {
+        background: #fff; border-radius: 14px;
+        box-shadow: 0 2px 18px rgba(0,0,0,0.07); padding: 28px 30px; margin-bottom: 24px;
+    }
+    .info-card h4 {
+        font-size: 1.05rem; font-weight: 700; color: #1a1a2e;
+        margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0;
+    }
+    .highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .highlight-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 14px; background: #f8f9ff; border-radius: 10px;
+        font-size: 0.88rem; color: #444;
+    }
+    .highlight-item .fa { color: #e85d24; font-size: 1rem; width: 18px; text-align: center; }
+    .tour-desc { color: #555; font-size: 0.95rem; line-height: 1.85; }
+    .booking-card {
+        background: #fff; border-radius: 16px;
+        box-shadow: 0 4px 28px rgba(0,0,0,0.10); padding: 28px;
+        position: sticky; top: 20px;
+    }
+    .price-block { text-align: center; margin-bottom: 20px; }
+    .price-block .price-main { font-size: 2rem; font-weight: 800; color: #e85d24; }
+    .price-block .price-unit { font-size: 0.85rem; color: #888; }
+    .price-block .price-old { font-size: 0.95rem; color: #aaa; text-decoration: line-through; margin-right: 8px; }
+    .price-block .badge-discount {
+        background: #fff3ed; color: #e85d24; font-size: 0.75rem; font-weight: 700;
+        padding: 2px 10px; border-radius: 20px; border: 1px solid #e85d24;
+    }
+    .price-child {
+        text-align: center; font-size: 0.88rem; color: #666;
+        margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #f0f0f0;
+    }
+    .price-child span { font-weight: 700; color: #e85d24; }
+    .booking-meta { margin-bottom: 20px; }
+    .booking-meta-row {
+        display: flex; justify-content: space-between;
+        padding: 8px 0; font-size: 0.88rem;
+        border-bottom: 1px dashed #f0f0f0; color: #555;
+    }
+    .booking-meta-row:last-child { border-bottom: none; }
+    .booking-meta-row .val { font-weight: 600; color: #222; }
+    .slots-bar { background: #f0f0f0; border-radius: 30px; height: 8px; margin: 4px 0 8px; overflow: hidden; }
+    .slots-fill {
+        height: 100%; border-radius: 30px;
+        background: linear-gradient(90deg, #e85d24, #f5a623); transition: width 0.5s;
+    }
+    .slots-label { font-size: 0.8rem; color: #888; margin-bottom: 18px; }
+    .btn-book {
+        display: block; width: 100%; padding: 15px;
+        background: linear-gradient(135deg, #e85d24, #c0391a);
+        color: #fff !important; border: none; border-radius: 12px;
+        font-size: 1rem; font-weight: 700; text-align: center; text-decoration: none;
+        cursor: pointer; transition: all 0.3s; letter-spacing: 0.3px; margin-bottom: 12px;
+    }
+    .btn-book:hover {
+        transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,93,36,0.4);
+        color: #fff !important; text-decoration: none;
+    }
+    .btn-book.disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-custom {
+        display: block; width: 100%; padding: 13px; background: transparent;
+        color: #e85d24 !important; border: 2px solid #e85d24; border-radius: 12px;
+        font-size: 0.9rem; font-weight: 600; text-align: center; text-decoration: none; transition: all 0.3s;
+    }
+    .btn-custom:hover { background: #e85d24; color: #fff !important; text-decoration: none; }
+    .related-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; color: #1a1a2e; }
+    .related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @@media (max-width: 700px) { .related-grid { grid-template-columns: 1fr; } }
+    .related-card {
+        background: #fff; border-radius: 12px; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+        overflow: hidden; transition: transform 0.25s; text-decoration: none; color: inherit; display: block;
+    }
+    .related-card:hover { transform: translateY(-4px); text-decoration: none; color: inherit; }
+    .related-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .related-card .rc-body { padding: 14px; }
+    .related-card .rc-days { font-size: 0.75rem; font-weight: 700; color: #e85d24; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .related-card .rc-title { font-size: 0.92rem; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; line-height: 1.35; }
+    .related-card .rc-price { font-size: 0.85rem; color: #e85d24; font-weight: 700; }
+</style>
+
+<!-- Hero -->
+<div class="tour-hero" style="background-image: url('@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/bg_1.jpg" : Model.ImageUrl)')">
+    <div class="overlay"></div>
+    <div class="tour-hero-content">
+        <span class="badge-type">@(Model.TourType ?? "Tour")</span>
+        <h1>@Model.Title</h1>
+        <div class="hero-meta">
+            <span><span class="fa fa-map-marker"></span> @(Model.Region ?? "Vietnam")</span>
+            <span><span class="fa fa-clock-o"></span> @Model.DurationDays days @Model.DurationNights nights</span>
+            <span><span class="fa fa-plane"></span> Departure from @(Model.DepartureCity ?? "—")</span>
+            <span><span class="fa fa-users"></span> Max @(Model.MaxGroupSize ?? 0) people</span>
+        </div>
+    </div>
+</div>
+
+<!-- Breadcrumb -->
+<div style="background: #f8f8f8; padding: 10px 0; border-bottom: 1px solid #eee;">
+    <div style="max-width: 1100px; margin: 0 auto; padding: 0 20px; font-size: 0.85rem; color: #888;">
+        <a href="/" style="color:#888;">Home</a>
+        <span class="fa fa-chevron-right" style="margin: 0 8px; font-size: 0.75rem;"></span>
+        <a href="/Tour/Index" style="color:#888;">Tour List</a>
+        <span class="fa fa-chevron-right" style="margin: 0 8px; font-size: 0.75rem;"></span>
+        <span style="color:#e85d24;">@Model.Title</span>
+    </div>
+</div>
+
+<div class="tour-detail-wrap">
+    <div class="tour-main">
+
+        <!-- LEFT COLUMN -->
+        <div>
+            <div class="info-card">
+                <h4><span class="fa fa-star" style="color:#e85d24; margin-right:8px;"></span>Tour Highlights</h4>
+                <div class="highlights">
+                    <div class="highlight-item">
+                        <span class="fa fa-calendar"></span>
+                        <span><strong>@Model.DurationDays days</strong> @Model.DurationNights nights</span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="fa fa-map-marker"></span>
+                        <span>Region: <strong>@(Model.Region ?? "—")</strong></span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="fa fa-plane"></span>
+                        <span>Departure: <strong>@(Model.DepartureCity ?? "—")</strong></span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="fa fa-tag"></span>
+                        <span>Type: <strong>@(Model.TourType ?? "—")</strong></span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="fa fa-users"></span>
+                        <span>Max <strong>@(Model.MaxGroupSize ?? 0) people</strong></span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="fa fa-child"></span>
+                        <span>Children: <strong>@Model.PricePerChild.ToString("N0") đ</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="info-card">
+                    <h4><span class="fa fa-align-left" style="color:#e85d24; margin-right:8px;"></span>Tour Description</h4>
+                    <div class="tour-desc">@Html.Raw(Model.Description.Replace("\n", "<br/>"))</div>
+                </div>
+            }
+
+            <div class="info-card">
+                <h4><span class="fa fa-money" style="color:#e85d24; margin-right:8px;"></span>Pricing</h4>
+                <table style="width:100%; font-size:0.92rem; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#f8f8f8;">
+                            <th style="padding:10px 14px; text-align:left; font-weight:600; color:#555;">Type</th>
+                            <th style="padding:10px 14px; text-align:right; font-weight:600; color:#555;">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #f0f0f0;">
+                            <td style="padding:12px 14px;">
+                                <span class="fa fa-user" style="color:#e85d24; margin-right:6px;"></span>Adult
+                            </td>
+                            <td style="padding:12px 14px; text-align:right; font-weight:700; color:#e85d24;">
+                                @Model.PricePerPerson.ToString("N0") đ
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px 14px;">
+                                <span class="fa fa-child" style="color:#4f8ef7; margin-right:6px;"></span>Children
+                                <small style="color:#888; display:block; font-size:0.78rem;">Under 12 years old</small>
+                            </td>
+                            <td style="padding:12px 14px; text-align:right; font-weight:700; color:#4f8ef7;">
+                                @Model.PricePerChild.ToString("N0") đ
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.8rem; color:#aaa; margin: 14px 0 0; padding-top:12px; border-top:1px dashed #eee;">
+                    <span class="fa fa-info-circle" style="margin-right:4px;"></span>
+                    Price includes basic services. Please contact us for more details.
+                </p>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+            <div class="booking-card">
+                <div class="price-block">
+                    @if (discountPct > 0 && Model.OriginalPrice.HasValue)
+                    {
+                        <div>
+                            <span class="price-old">@Model.OriginalPrice.Value.ToString("N0") đ</span>
+                            <span class="badge-discount">-@discountPct%</span>
+                        </div>
+                    }
+                    <div class="price-main">@Model.PricePerPerson.ToString("N0") đ</div>
+                    <div class="price-unit">/ adult</div>
+                </div>
+
+                <div class="price-child">
+                    Children: <span>@Model.PricePerChild.ToString("N0") đ</span> / child
+                </div>
+
+                <div class="booking-meta">
+                    <div class="booking-meta-row">
+                        <span><span class="fa fa-clock-o" style="color:#e85d24; margin-right:5px;"></span>Duration</span>
+                        <span class="val">@Model.DurationDays days @Model.DurationNights nights</span>
+                    </div>
+                    <div class="booking-meta-row">
+                        <span><span class="fa fa-map-marker" style="color:#e85d24; margin-right:5px;"></span>Departure</span>
+                        <span class="val">@(Model.DepartureCity ?? "—")</span>
+                    </div>
+                    <div class="booking-meta-row">
+                        <span><span class="fa fa-tag" style="color:#e85d24; margin-right:5px;"></span>Tour Type</span>
+                        <span class="val">@(Model.TourType ?? "—")</span>
+                    </div>
+                    <div class="booking-meta-row">
+                        <span><span class="fa fa-users" style="color:#e85d24; margin-right:5px;"></span>Available Slots</span>
+                        <span class="val" style="color:@(availableSlots > 5 ? "#27ae60" : "#e85d24");">
+                            @availableSlots slots
+                        </span>
+                    </div>
+                </div>
+
+                @{
+                    int maxSlots = Model.MaxGroupSize ?? 1;
+                    int filledSlots = maxSlots - availableSlots;
+                    int fillPct = maxSlots > 0 ? (int)Math.Round((double)filledSlots / maxSlots * 100) : 0;
+                }
+                <div class="slots-bar">
+                    <div class="slots-fill" style="width: @fillPct%;"></div>
+                </div>
+                <div class="slots-label">@filledSlots / @maxSlots slots booked</div>
+
+                @if (availableSlots > 0)
+                {
+                    <a href="/Booking/Create?tourId=@Model.TourID" class="btn-book">
+                        <span class="fa fa-calendar-check-o" style="margin-right:6px;"></span>
+                        Book Now
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-book disabled">
+                        <span class="fa fa-times-circle" style="margin-right:6px;"></span>
+                        Fully Booked
+                    </span>
+                }
+
+                <a href="/Booking/RequestCustom" class="btn-custom">
+                    <span class="fa fa-edit" style="margin-right:6px;"></span>
+                    Request Custom Tour
+                </a>
+
+                <p style="text-align:center; font-size:0.78rem; color:#aaa; margin-top:14px;">
+                    <span class="fa fa-lock" style="margin-right:4px;"></span>
+                    Secure booking · Free cancellation within 24h
+                </p>
+            </div>
+        </div>
+    </div>
+
+    @if (related.Any())
+    {
+        <div style="margin-top: 48px;">
+            <h3 class="related-title">
+                <span class="fa fa-compass" style="color:#e85d24; margin-right:8px;"></span>
+                Related Tours
+            </h3>
+            <div class="related-grid">
+                @foreach (var r in related)
+                {
+                    <a href="/Tour/Detail/@r.TourID" class="related-card">
+                        <img src="@(string.IsNullOrEmpty(r.ImageUrl) ? "/images/bg_1.jpg" : r.ImageUrl)"
+                             alt="@r.Title" />
+                        <div class="rc-body">
+                            <div class="rc-days">@r.DurationDays days @r.DurationNights nights</div>
+                            <div class="rc-title">@r.Title</div>
+                            <div class="rc-price">@r.PricePerPerson.ToString("N0") đ / person</div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>

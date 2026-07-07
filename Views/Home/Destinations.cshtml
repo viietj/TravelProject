@@ -1,0 +1,216 @@
+@model List<TravelProject.Models.Destination>
+@{
+    ViewData["Title"] = "Destination";
+}
+<section class="hero-wrap hero-wrap-2 js-fullheight"
+style="background-image: url('/images/destination-banner.jpg');">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
+      <div class="col-md-9 ftco-animate pb-5 text-center">
+         <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home <i class="fa fa-chevron-right"></i></a></span> <span>Destination <i class="fa fa-chevron-right"></i></span></p>
+        @if (ViewBag.DestinationName != null)
+{
+    <h1 class="mb-0 bread">Tours tại @ViewBag.DestinationName</h1>
+}
+else
+{
+    <h1 class="mb-0 bread">Destination</h1>
+}
+     </div>
+ </div>
+</div>
+</section>
+
+<section class="ftco-section ftco-no-pb">
+   <div class="container">
+      <div class="row">
+       <div class="col-md-12">
+          <div class="search-wrap-1 ftco-animate">
+             <form action="/Tour/Index" method="get" class="search-property-1">
+
+    @if (ViewBag.DestinationId != null)
+    {
+        <input type="hidden" name="destinationId" value="@ViewBag.DestinationId" />
+    }
+
+    <div class="row no-gutters">
+
+        <div class="col-lg d-flex">
+            <div class="form-group p-4 border-0">
+                <label>Destination</label>
+                <div class="form-field">
+                    <div class="icon"><span class="fa fa-search"></span></div>
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Search place, city..."
+                           value="@ViewBag.Search" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg d-flex">
+            <div class="form-group p-4">
+                <label>Tour Type</label>
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="fa fa-chevron-down"></span></div>
+                        <select name="type" class="form-control">
+                            <option value="">All Types</option>
+                            @foreach (var t in new[] { "Cultural","Adventure","Beach","Eco","Food","City","Combo" })
+                            {
+                                if (ViewBag.Type == t)
+                                {
+                                    <option value="@t" selected>@t</option>
+                                 }
+                                 else
+                                {
+                                    <option value="@t">@t</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg d-flex">
+            <div class="form-group p-4">
+                <label>Region</label>
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="fa fa-chevron-down"></span></div>
+                        <select name="region" class="form-control">
+                            <option value="">All Regions</option>
+                            @foreach (var r in new[] { "North","Central","South" })
+                            {
+                                if (ViewBag.Region == r)
+        {
+            <option value="@r" selected>@r</option>
+        }
+        else
+        {
+            <option value="@r">@r</option>
+        }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg d-flex">
+            <div class="form-group p-4">
+                <label>Max Price (VND)</label>
+                <div class="form-field">
+                    <div class="select-wrap">
+                        <div class="icon"><span class="fa fa-chevron-down"></span></div>
+                        <select name="maxPrice" class="form-control">
+                            <option value="">Any Price</option>
+                            @if (ViewBag.MaxPrice == 500000m)
+                        {
+                            <option value="500000" selected>Under 500K</option>
+                        }
+                        else
+                        {
+                             <option value="500000">Under 500K</option>
+                        }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg d-flex">
+            <div class="form-group d-flex w-100 border-0">
+                <div class="form-field w-100 align-items-center d-flex">
+                    <input type="submit" value="Search"
+                           class="align-self-stretch form-control btn btn-primary" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="ftco-section">
+   <div class="container">
+    <div class="row">
+
+@foreach (var item in Model)
+{
+    <div class="col-md-4 ftco-animate">
+
+        <div class="project-wrap">
+
+            <a asp-controller="Home"
+   asp-action="DestinationDetail"
+   asp-route-id="@item.DestinationID"
+   class="img"
+   style="background-image:url('@item.ImageUrl')">
+
+    <span class="price">
+        @item.Category
+    </span>
+</a>
+
+            <div class="text p-4">
+
+                <span class="days">
+                    Explore Destination
+                </span>
+
+                <h3>
+                    @item.Name
+                </h3>
+
+                <p class="location">
+
+                    <span class="fa fa-map-marker"></span>
+
+                    @item.Region
+
+                </p>
+
+            </div>
+        </div>
+    </div>
+}
+
+</div>
+<div class="row mt-5">
+  <div class="col text-center">
+    <div class="block-27">
+      <ul>
+        <li><a href="#">&lt;</a></li>
+        <li class="active"><span>1</span></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#">&gt;</a></li>
+    </ul>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="ftco-intro ftco-section ftco-no-pt">
+ <div class="container">
+    <div class="row justify-content-center">
+       <div class="col-md-12 text-center">
+          <div class="img"  style="background-image: url(images/bg_2.jpg);">
+             <div class="overlay"></div>
+             <h2>We Are Pacific A Travel Agency</h2>
+             <p>We can manage your dream building A small river named Duden flows by their place</p>
+             <p class="mb-0"><a href="#" class="btn btn-primary px-4 py-3">Ask For A Quote</a></p>
+         </div>
+     </div>
+ </div>
+</div>
+</section>

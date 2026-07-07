@@ -1,0 +1,289 @@
+@model List<TravelProject.Models.HotelBooking>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Manage Hotel Bookings";
+}
+
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1.5px solid #dee2e6;
+        color: #495057;
+        background: white;
+        transition: all 0.2s;
+    }
+    .filter-btn:hover { background: #f8f9fa; }
+    .filter-btn.active-all        { background: #343a40; color: white; border-color: #343a40; }
+    .filter-btn.active-pending    { background: #fff3cd; color: #856404; border-color: #ffc107; }
+    .filter-btn.active-confirmed  { background: #d1e7dd; color: #0a3622; border-color: #198754; }
+    .filter-btn.active-cancelled  { background: #f8d7da; color: #842029; border-color: #dc3545; }
+
+    .stat-cards { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-card {
+        flex: 1; min-width: 150px;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border-top: 4px solid #dee2e6;
+    }
+    .stat-card.pending   { border-top-color: #ffc107; }
+    .stat-card.confirmed { border-top-color: #198754; }
+    .stat-card.cancelled { border-top-color: #dc3545; }
+    .stat-card .stat-num { font-size: 2rem; font-weight: 800; color: #1a1a2e; }
+    .stat-card .stat-label { font-size: 0.82rem; color: #888; font-weight: 600; }
+
+    .booking-table { width: 100%; border-collapse: collapse; }
+    .booking-table th {
+        background: #f8f9fa;
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .booking-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 0.9rem;
+        color: #2c3e50;
+        vertical-align: middle;
+    }
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .badge-pending   { background: #fff3cd; color: #856404; }
+    .badge-confirmed { background: #d1e7dd; color: #0a3622; }
+    .badge-cancelled { background: #f8d7da; color: #842029; }
+
+    .btn-action-confirm {
+        background-color: #198754;
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-action-confirm:hover { background-color: #157347; }
+
+    .btn-action-cancel {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-action-cancel:hover { background-color: #bb2d3b; }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <strong>Success!</strong> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <strong>Error!</strong> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Stats Overview Cards -->
+        <div class="stat-cards">
+            <div class="stat-card">
+                <div class="stat-num">@Model.Count</div>
+                <div class="stat-label">Total Reservations</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-num">@ViewBag.PendingCount</div>
+                <div class="stat-label">Pending Approval</div>
+            </div>
+            <div class="stat-card confirmed">
+                <div class="stat-num">@ViewBag.ConfirmedCount</div>
+                <div class="stat-label">Confirmed Stays</div>
+            </div>
+            <div class="stat-card cancelled">
+                <div class="stat-num">@ViewBag.CancelledCount</div>
+                <div class="stat-label">Cancelled Reservations</div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <a href="/Admin/ManageHotelBookings" class="filter-btn @(string.IsNullOrEmpty(ViewBag.StatusFilter) ? "active-all" : "")">All Bookings</a>
+            <a href="/Admin/ManageHotelBookings?status=Pending" class="filter-btn @(ViewBag.StatusFilter == "Pending" ? "active-pending" : "")">Pending (@ViewBag.PendingCount)</a>
+            <a href="/Admin/ManageHotelBookings?status=Confirmed" class="filter-btn @(ViewBag.StatusFilter == "Confirmed" ? "active-confirmed" : "")">Confirmed (@ViewBag.ConfirmedCount)</a>
+            <a href="/Admin/ManageHotelBookings?status=Cancelled" class="filter-btn @(ViewBag.StatusFilter == "Cancelled" ? "active-cancelled" : "")">Cancelled (@ViewBag.CancelledCount)</a>
+        </div>
+
+        <!-- List Table Card -->
+        <div class="card shadow-sm" style="border-radius: 12px; overflow: hidden; border:none;">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="booking-table">
+                        <thead>
+                            <tr>
+                                <th>Reservation ID</th>
+                                <th>Hotel & Room</th>
+                                <th>User Account</th>
+                                <th>Customer Details</th>
+                                <th>Stay Dates</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center py-5 text-muted">
+                                        <i class="fas fa-bed fa-2x mb-3"></i>
+                                        <p class="mb-0">No hotel reservations found in this status.</p>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td><strong>#H@(item.BookingID)</strong></td>
+                                        <td>
+                                            <div class="fw-bold text-dark">@item.Hotel?.Name</div>
+                                            <div style="font-size:0.75rem; color:#6c757d;">@item.RoomCount Room(s) (@item.RoomType)</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">@item.User?.Username</div>
+                                            <div style="font-size:0.75rem; color:#6c757d;">User ID: #@item.UserID</div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">@item.CustomerName</div>
+                                            <div style="font-size:0.75rem; color:#6c757d;">
+                                                <i class="fas fa-phone me-1"></i>@item.CustomerPhone <br />
+                                                <i class="fas fa-envelope me-1"></i>@item.CustomerEmail
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold">@item.CheckInDate.ToString("dd/MM/yyyy") - @item.CheckOutDate.ToString("dd/MM/yyyy")</div>
+                                            <div style="font-size:0.75rem; color:#6c757d;">
+                                                Nights: @((item.CheckOutDate.Date - item.CheckInDate.Date).Days)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-success">@item.TotalPrice.ToString("N0") VND</div>
+                                        </td>
+                                        <td>
+                                            @if (item.Status == "Pending")
+                                            {
+                                                <span class="status-badge badge-pending">Pending</span>
+                                            }
+                                            else if (item.Status == "Confirmed")
+                                            {
+                                                <span class="status-badge badge-confirmed">Confirmed</span>
+                                            }
+                                            else if (item.Status == "Completed")
+                                            {
+                                                <span class="status-badge badge-confirmed" style="background:#e0f2fe; color:#0369a1;">Completed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge badge-cancelled">Cancelled</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.PaymentStatus == "Paid")
+                                            {
+                                                <span class="status-badge badge-confirmed" style="text-transform:none;">Paid</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge badge-cancelled" style="text-transform:none; background:#ffb84d; color:#fff;">Unpaid</span>
+                                            }
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <div class="d-flex flex-column gap-2 justify-content-center align-items-center">
+                                            @if (item.Status == "Pending")
+                                            {
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <form method="post" action="/Admin/ConfirmHotelBooking" onsubmit="return confirm('Confirm this booking reservation?');">
+                                                        <input type="hidden" name="bookingId" value="@item.BookingID" />
+                                                        <button type="submit" class="btn-action-confirm">Confirm</button>
+                                                    </form>
+                                                    <form method="post" action="/Admin/CancelHotelBooking" onsubmit="return confirm('Cancel this booking reservation?');">
+                                                        <input type="hidden" name="bookingId" value="@item.BookingID" />
+                                                        <button type="submit" class="btn-action-cancel">Cancel</button>
+                                                    </form>
+                                                </div>
+                                            }
+                                            else if (item.Status == "Confirmed")
+                                            {
+                                                @if (item.PaymentStatus != "Paid")
+                                                {
+                                                    <form method="post" action="/Admin/ConfirmHotelPayment" onsubmit="return confirm('Confirm payment manually?');" style="margin:0;">
+                                                        <input type="hidden" name="bookingId" value="@item.BookingID" />
+                                                        <button type="submit" class="btn-action-confirm" style="background-color:#0d6efd;">Paid Cash</button>
+                                                    </form>
+                                                }
+                                                <form method="post" action="/Admin/CompleteHotelBooking" onsubmit="return confirm('Mark stay as completed?');" style="margin:0;">
+                                                    <input type="hidden" name="bookingId" value="@item.BookingID" />
+                                                    <button type="submit" class="btn-action-confirm" style="background-color:#0dcaf0; color:#000;">Complete</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span style="font-size:0.8rem; color:#cbd5e1;">No actions</span>
+                                            }
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    @if (!string.IsNullOrEmpty(item.Notes))
+                                    {
+                                        <tr style="background-color: #fafbfc;">
+                                            <td colspan="9" class="p-2" style="font-size:0.8rem; border-top:none;">
+                                                <div class="mx-3 p-2 bg-light border-start border-warning border-3 rounded">
+                                                    <strong>Special Requests:</strong> @item.Notes
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

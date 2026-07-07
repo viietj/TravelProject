@@ -1,0 +1,415 @@
+@model List<TravelProject.Models.Hotel>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Hotels";
+}
+
+<style>
+    /* Hero Section styling */
+    .hotel-hero {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('/images/bg_1.jpg');
+        background-size: cover;
+        background-position: center center;
+        height: 380px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .hotel-hero-content {
+        text-align: center;
+        color: #fff;
+    }
+    .hotel-hero-content h1 {
+        font-size: 2.8rem;
+        font-weight: 850;
+        margin-bottom: 10px;
+        font-family: 'Poppins', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .hotel-hero-content p {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 400;
+    }
+
+    /* Listing Page wrapper */
+    .hotel-list-wrapper {
+        padding: 50px 0 80px 0;
+        background-color: #f7f9fc;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Filter Sidebar */
+    .filter-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eef2f6;
+        padding: 24px;
+        position: sticky;
+        top: 20px;
+    }
+    .filter-title {
+        font-size: 1.15rem;
+        font-weight: 750;
+        color: #1a1a2e;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f15d30;
+        padding-bottom: 8px;
+    }
+    .filter-group {
+        margin-bottom: 20px;
+    }
+    .filter-group label {
+        font-weight: 650;
+        font-size: 0.88rem;
+        color: #4a5568;
+        display: block;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .filter-control {
+        border-radius: 8px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        width: 100%;
+        background-color: #fff;
+    }
+    .filter-control:focus {
+        border-color: #f15d30;
+        box-shadow: 0 0 0 3px rgba(241, 93, 48, 0.15);
+        outline: none;
+    }
+    .btn-filter-submit {
+        background: linear-gradient(135deg, #f15d30, #ff7e40);
+        color: #fff;
+        border: none;
+        padding: 12px;
+        font-weight: 700;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(241, 93, 48, 0.25);
+    }
+    .btn-filter-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(241, 93, 48, 0.35);
+        color: #fff;
+    }
+    .btn-filter-reset {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        font-weight: 700;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+    }
+    .btn-filter-reset:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    /* Hotel Card Grid */
+    .hotel-card {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #edf2f7;
+        margin-bottom: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .hotel-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    .hotel-img-wrapper {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        background-color: #e2e8f0;
+    }
+    .hotel-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .hotel-card:hover .hotel-img {
+        transform: scale(1.08);
+    }
+    .hotel-type-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: rgba(26, 26, 46, 0.85);
+        backdrop-filter: blur(4px);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 2;
+    }
+    .hotel-price-badge {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: #f15d30;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 850;
+        z-index: 2;
+        box-shadow: 0 4px 10px rgba(241, 93, 48, 0.3);
+    }
+    .hotel-info-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .hotel-stars {
+        color: #fbbf24;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        letter-spacing: 2px;
+    }
+    .hotel-name {
+        font-size: 1.15rem;
+        font-weight: 750;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+        line-height: 1.4;
+        min-height: 48px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .hotel-location {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .hotel-location i {
+        color: #ef4444;
+    }
+    .hotel-amenities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+    .amenity-tag {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.72rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+    .hotel-card-footer {
+        padding: 0 24px 24px 24px;
+        border-top: none;
+        background: transparent;
+    }
+    .btn-view-hotel {
+        display: block;
+        text-align: center;
+        background: #1a1a2e;
+        color: #fff;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.88rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        border: 1.5px solid #1a1a2e;
+    }
+    .btn-view-hotel:hover {
+        background: transparent;
+        color: #1a1a2e;
+        box-shadow: 0 4px 12px rgba(26, 26, 46, 0.15);
+    }
+    .empty-hotels {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #edf2f7;
+    }
+    .empty-hotels i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+    }
+    .empty-hotels h3 {
+        font-size: 1.3rem;
+        color: #1a1a2e;
+        font-weight: 700;
+    }
+</style>
+
+<div class="hotel-hero">
+    <div class="hotel-hero-content">
+        <h1>Find Your Dream Stay</h1>
+        <p>Explore luxury resorts, boutique hotels, and cozy homestays in Vietnam</p>
+    </div>
+</div>
+
+<div class="hotel-list-wrapper">
+    <div class="container">
+        <div class="row">
+            <!-- Left Filter Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="filter-card">
+                    <h3 class="filter-title">Filter Hotels</h3>
+                    <form action="/Hotel" method="get">
+                        <div class="filter-group">
+                            <label>Destination / City</label>
+                            <input type="text" name="search" class="filter-control" placeholder="Search city or hotel..." value="@ViewBag.Search" />
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Hotel Type</label>
+                            <select name="type" class="filter-control">
+                                <option value="">All Types</option>
+                                @foreach (var type in new[] { "Hotel", "Resort", "Hostel", "Villa", "Homestay" })
+                                {
+                                    if (ViewBag.Type == type)
+                                    {
+                                        <option value="@type" selected>@type</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Star Rating</label>
+                            <select name="rating" class="filter-control">
+                                <option value="">Any Stars</option>
+                                @for (byte i = 5; i >= 1; i--)
+                                {
+                                    if (ViewBag.Rating == i)
+                                    {
+                                        <option value="@i" selected>@i Stars</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i Stars</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Max Price (VND/night)</label>
+                            <select name="maxPrice" class="filter-control">
+                                <option value="">Any Price</option>
+                                @foreach (var p in new[] { 500000, 1000000, 2000000, 4000000, 6000000 })
+                                {
+                                    var displayPrice = $"{p:N0} VND";
+                                    if (ViewBag.MaxPrice == (decimal)p)
+                                    {
+                                        <option value="@p" selected>Under @displayPrice</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@p">Under @displayPrice</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-filter-submit w-100 mb-2">Search & Apply</button>
+                        <a href="/Hotel" class="btn-filter-reset">Clear Filters</a>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Hotel Cards List -->
+            <div class="col-lg-9">
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="empty-hotels">
+                        <i class="fa fa-bed"></i>
+                        <h3>No hotels found matching your search.</h3>
+                        <p class="text-muted">Try removing filters or searching for another destination.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var hotel in Model)
+                        {
+                            <div class="col-md-6 mb-4">
+                                <div class="hotel-card">
+                                    <div class="hotel-img-wrapper">
+                                        <span class="hotel-type-badge">@hotel.HotelType</span>
+                                        <img src="@(string.IsNullOrEmpty(hotel.ImageUrl) ? "/images/bg_1.jpg" : hotel.ImageUrl)" class="hotel-img" alt="@hotel.Name" />
+                                        <span class="hotel-price-badge">@hotel.PricePerNight.ToString("N0") VND/night</span>
+                                    </div>
+
+                                    <div class="hotel-info-body">
+                                        <div class="hotel-stars">
+                                            @for (int i = 0; i < hotel.StarRating; i++)
+                                            {
+                                                <i class="fa fa-star"></i>
+                                            }
+                                        </div>
+                                        <h3 class="hotel-name">@hotel.Name</h3>
+                                        <div class="hotel-location">
+                                            <i class="fa fa-map-marker"></i>
+                                            <span>@hotel.Address, @hotel.City</span>
+                                        </div>
+
+                                        <div class="hotel-amenities">
+                                            @if (!string.IsNullOrEmpty(hotel.Amenities))
+                                            {
+                                                foreach (var amenity in hotel.Amenities.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                                {
+                                                    <span class="amenity-tag">@amenity.Trim()</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="hotel-card-footer">
+                                        <a href="/Hotel/Details/@hotel.HotelID" class="btn-view-hotel">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,261 @@
+@model List<TravelProject.Models.FoodBlog>
+
+@{
+    ViewData["Title"] = "Food Blog";
+
+    string? activeRegion = ViewBag.Region as string;
+    string? activeSeason = ViewBag.Season as string;
+}
+
+<!-- HERO -->
+<section class="hero-wrap hero-wrap-2 js-fullheight"
+         style="background-image: url('/images/bg_1.jpg');">
+
+    <div class="overlay"></div>
+
+    <div class="container">
+        <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
+
+            <div class="col-md-9 ftco-animate pb-5 text-center">
+
+                <p class="breadcrumbs">
+                    <span class="mr-2">
+                        <a asp-controller="Home" asp-action="Index">
+                            Home
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                    </span>
+
+                    <span>
+                        Food Blog
+                        <i class="fa fa-chevron-right"></i>
+                    </span>
+                </p>
+
+                <h1 class="mb-0 bread">
+                    Vietnamese Cuisine by Region & Season
+                </h1>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FILTER -->
+<section class="ftco-section ftco-no-pb pt-4 pb-2"
+         style="background:#fdf6ee;">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-12">
+
+                <div class="food-filter-bar">
+
+                    <!-- SEARCH -->
+                    <input type="text"
+                           class="form-control search-food"
+                           placeholder="Search food..." />
+
+                    <!-- REGION -->
+                    <select class="form-control filter-select"
+                            onchange="location = this.value;">
+
+                        <option value="@Url.Action("Index", new { season = activeSeason })">
+                            All Regions
+                        </option>
+
+                        @foreach (var r in new[] { "North", "Central", "South" })
+                        {
+                            <option value="@Url.Action("Index", new { region = r, season = activeSeason })">
+                                @r
+                            </option>
+                        }
+
+                    </select>
+
+                    <!-- SEASON -->
+                    <select class="form-control filter-select"
+                            onchange="location = this.value;">
+
+                        <option value="@Url.Action("Index", new { region = activeRegion })">
+                            All Seasons
+                        </option>
+
+                        @foreach (var s in new[] { "Spring", "Summer", "Autumn", "Winter" })
+                        {
+                            <option value="@Url.Action("Index", new { region = activeRegion, season = s })">
+                                @s
+                            </option>
+                        }
+
+                    </select>
+
+                    <!-- BUTTON -->
+                    <button class="btn-search-food">
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- BLOG -->
+<section class="ftco-section">
+
+    <div class="container">
+
+        @if (!Model.Any())
+        {
+            <div class="row">
+
+                <div class="col-12 text-center py-5">
+
+                    <h4 class="text-muted">
+                        No posts found.
+                    </h4>
+
+                    <a asp-action="Index"
+                       class="btn btn-primary mt-3">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="row d-flex">
+
+                @foreach (var blog in Model)
+                {
+                    <div class="col-md-4 d-flex ftco-animate mb-4">
+
+                        <div class="blog-entry justify-content-end w-100">
+
+                            <!-- IMAGE -->
+                            <a asp-action="Detail"
+                               asp-route-id="@blog.BlogID"
+                               class="block-20"
+                               style="background-image:url('@(blog.ImageUrl ?? "/images/image_1.jpg")');">
+                            </a>
+
+                            <div class="text">
+
+                                
+
+                                <!-- TITLE -->
+                                <h3 class="heading">
+
+                                    <a asp-action="Detail"
+                                       asp-route-id="@blog.BlogID">
+
+                                        @blog.Title
+
+                                    </a>
+
+                                </h3>
+
+                                <!-- DESCRIPTION -->
+                                <p class="text-muted"
+                                   style="font-size:0.9rem;">
+
+                                    @blog.Description
+
+                                </p>
+
+                                <!-- BUTTON -->
+                                <p>
+
+                                    <a asp-action="Detail"
+                                       asp-route-id="@blog.BlogID"
+                                       class="btn btn-primary">
+
+                                        Read more
+
+                                    </a>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </div>
+
+</section>
+
+<style>
+
+    .blog-entry .block-20{
+        height:220px;
+    }
+
+    .food-filter-bar{
+        width:100%;
+
+        display:flex;
+        flex-wrap:wrap;
+
+        justify-content:center;
+        align-items:center;
+
+        gap:15px;
+
+        background:#fff;
+
+        padding:20px;
+
+        border-radius:10px;
+    }
+
+    .search-food{
+        width:320px;
+        height:45px;
+
+        border-radius:8px;
+    }
+
+    .filter-select{
+        width:190px;
+        height:45px;
+
+        border-radius:8px;
+    }
+
+    .btn-search-food{
+        height:45px;
+
+        padding:0 28px;
+
+        border:none;
+        border-radius:8px;
+
+        background:#ff5e14;
+
+        color:white;
+        font-weight:600;
+    }
+
+    .btn-search-food:hover{
+        background:#e14d08;
+    }
+
+    
+</style>

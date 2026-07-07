@@ -1,0 +1,196 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Design Your Custom Tour";
+}
+
+<style>
+    /* Fix transparent navbar blending with white page background */
+    #ftco-navbar {
+        background: #1a1a2e !important;
+        position: relative !important;
+        top: 0;
+    }
+    .custom-booking-wrapper {
+        max-width: 850px;
+        margin: 30px auto 50px;
+        padding: 0 16px 60px;
+        font-family: 'Poppins', sans-serif;
+    }
+    .custom-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    .custom-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #ff6b6b, #4f8ef7);
+    }
+    .card-header-custom {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+    .card-header-custom h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1a1a2e;
+        margin-bottom: 10px;
+    }
+    .card-header-custom p {
+        color: #777;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    .full-width {
+        grid-column: span 2;
+    }
+    @@media (max-width: 600px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .full-width {
+            grid-column: span 1;
+        }
+        .custom-card {
+            padding: 24px;
+        }
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #4a5568;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: #2d3748;
+        background-color: #f7fafc;
+        transition: all 0.25s ease;
+        box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #4f8ef7;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #4f8ef7, #1a365d);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+        margin-top: 15px;
+    }
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(79,142,247,0.35);
+    }
+    .alert-success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        padding: 14px 18px;
+        border-radius: 10px;
+        margin-bottom: 24px;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="custom-booking-wrapper">
+    <div class="custom-card">
+        <div class="card-header-custom">
+            <h2> Design Your Custom Tour</h2>
+            <p>Tell us about your dream travel plans. We will design a custom itinerary and offer the best package quote within 24 hours!</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+        <form method="post" action="/Booking/RequestCustom">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label> Destinations You Want to Visit (Separated by commas)</label>
+                    <input type="text" name="destinations" required placeholder="e.g., Da Nang, Hoi An, Ba Na Hills..." />
+                </div>
+
+                <div class="form-group">
+                    <label> Expected Departure Date</label>
+                    <input type="date" name="departureDate" min="@DateTime.Now.AddDays(3).ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="form-group">
+                    <label> Duration (Days)</label>
+                    <input type="number" name="durationDays" min="1" max="30" value="3" required />
+                </div>
+
+                <div class="form-group">
+                    <label> Adult Count</label>
+                    <input type="number" name="adultCount" min="1" max="100" value="2" required />
+                </div>
+
+                <div class="form-group">
+                    <label> Child Count (If any)</label>
+                    <input type="number" name="childCount" min="0" max="100" value="0" />
+                </div>
+
+                <div class="form-group">
+                    <label> Hotel Standard</label>
+                    <select name="hotelStandard">
+                        <option value="Homestay/Guesthouse">Homestay / Budget Guest House</option>
+                        <option value="3-star" selected>3-Star Hotel</option>
+                        <option value="4-star">4-Star Hotel</option>
+                        <option value="5-star">5-Star Luxury Resort</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label> Desired Transport Type</label>
+                    <select name="transportType">
+                        <option value="Private Car" selected>Private Modern Car (New Model)</option>
+                        <option value="Tourist Bus">Shared High-Quality Shuttle Bus</option>
+                        <option value="Self-drive">Self-arranged Transport</option>
+                        <option value="Flight + Car">Flight Tickets + Airport Shuttle Service</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label> Special Requests & Detailed Notes</label>
+                    <textarea name="note" rows="4" placeholder="Please describe any special requests (e.g., private tour guide, vegetarian dietary, tour pace, photographers, specific activities)..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn"> Submit Custom Tour Request</button>
+        </form>
+    </div>
+</div>

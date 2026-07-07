@@ -1,0 +1,94 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Add New Tour";
+}
+@model TravelProject.Models.Tour
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Tour</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" action="/TourAdmin/Create">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Tour Name</label>
+                    <input name="Title" class="form-control" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Tour Type</label>
+                    <select name="TourType" class="form-control">
+                        <option>Combo</option>
+                        <option>City</option>
+                        <option>Food</option>
+                        <option>Eco</option>
+                        <option>Beach</option>
+                        <option>Adventure</option>
+                        <option>Cultural</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Main Destination</label>
+                    <select name="MainDestinationID" class="form-control" required>
+                        <option value="">-- Select Destination --</option>
+                        @if (ViewBag.Destinations != null)
+                        {
+                            foreach (var dest in (IEnumerable<TravelProject.Models.Destination>)ViewBag.Destinations)
+                            {
+                                <option value="@dest.DestinationID">@dest.Name (@dest.City)</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Region</label>
+                    <input name="Region" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Description</label>
+                    <textarea name="Description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Departure City</label>
+                    <input name="DepartureCity" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Image URL</label>
+                    <input name="ImageUrl" class="form-control" />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>Duration (Days)</label>
+                    <input name="DurationDays" type="number" min="0" class="form-control" required />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>Duration (Nights)</label>
+                    <input name="DurationNights" type="number" min="0" class="form-control" required />
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label>Max Group Size</label>
+                    <input name="MaxGroupSize" type="number" min="0" class="form-control" />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Price per Adult (VND)</label>
+                    <input name="PricePerPerson" type="number" min="0" class="form-control" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Price per Child (VND)</label>
+                    <input name="PricePerChild" type="number" min="0" class="form-control" value="0" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label>Original Price (VND)</label>
+                    <input name="OriginalPrice" type="number" min="0" class="form-control" />
+                </div>
+                <div class="col-md-2 mb-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input name="IsFeatured" type="checkbox" class="form-check-input" value="true" />
+                        <label class="form-check-label">Featured Tour</label>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Save</button>
+            <a href="/TourAdmin/Index" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>

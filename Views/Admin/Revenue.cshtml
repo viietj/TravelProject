@@ -1,0 +1,402 @@
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Revenue Report";
+
+    var selectedYear = (int)ViewBag.SelectedYear;
+    var totalAnnualRevenue = (decimal)ViewBag.TotalAnnualRevenue;
+    var tourRevenue = (decimal)ViewBag.TourRevenue;
+    var tourCount = (int)ViewBag.TourCount;
+    var hotelRevenue = (decimal)ViewBag.HotelRevenue;
+    var hotelCount = (int)ViewBag.HotelCount;
+    var pendingRevenue = (decimal)ViewBag.PendingRevenue;
+    var pendingCount = (int)ViewBag.PendingCount;
+
+    var tourMonthly = ViewBag.TourMonthly as decimal[];
+    var hotelMonthly = ViewBag.HotelMonthly as decimal[];
+    var tourQuarterly = ViewBag.TourQuarterly as decimal[];
+    var hotelQuarterly = ViewBag.HotelQuarterly as decimal[];
+    var topTours = ViewBag.TopTours;
+
+    var years = ViewBag.Years as List<int> ?? new List<int> { DateTime.Today.Year };
+}
+
+<style>
+    .revenue-container {
+        font-family: 'Poppins', sans-serif;
+        color: #1e293b;
+    }
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .year-select {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1.5px solid #cbd5e1;
+        font-weight: 600;
+        color: #334155;
+        background-color: white;
+    }
+    .btn-export {
+        background-color: white;
+        border: 1.5px solid #cbd5e1;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 650;
+        color: #334155;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    .btn-export:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+    /* Cards Grid */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    @@media (max-width: 992px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @@media (max-width: 576px) {
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .card-metric {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        border: 1px solid #e2e8f0;
+    }
+    .metric-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    .metric-val {
+        font-size: 1.6rem;
+        font-weight: 850;
+        color: #0f172a;
+    }
+    .metric-sub {
+        font-size: 0.76rem;
+        color: #94a3b8;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+    .metric-sub span {
+        font-weight: 700;
+    }
+    .card-metric.primary { border-left: 4px solid #3b82f6; }
+    .card-metric.success { border-left: 4px solid #10b981; }
+    .card-metric.info    { border-left: 4px solid #0d9488; }
+    .card-metric.warning { border-left: 4px solid #f59e0b; }
+
+    /* Layout Grid */
+    .chart-layout-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    @@media (max-width: 992px) {
+        .chart-layout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .chart-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        padding: 24px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .chart-title {
+        font-size: 1.05rem;
+        font-weight: 750;
+        color: #0f172a;
+        margin-bottom: 20px;
+    }
+    .chart-subtitle {
+        font-size: 0.82rem;
+        color: #64748b;
+        margin-top: -15px;
+        margin-bottom: 20px;
+    }
+
+    /* Quarter Cards inside detail panel */
+    .quarter-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .quarter-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+    }
+    .quarter-name {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+    }
+    .quarter-val {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 6px 0;
+    }
+    .quarter-pct {
+        font-size: 0.72rem;
+        color: #10b981;
+        font-weight: 600;
+    }
+</style>
+
+<div class="revenue-container container-fluid">
+    <div class="dashboard-header">
+        <h2 style="font-weight:800; color:#1a1a2e; margin:0;">Revenue Summary</h2>
+        <div class="header-actions">
+            <!-- Year form selector -->
+            <form action="/Admin/Revenue" method="get" id="year-form" style="margin:0;">
+                <select name="year" class="year-select" onchange="document.getElementById('year-form').submit()">
+                        @foreach (var y in years)
+                        {
+                            if (y == selectedYear)
+                            {
+                                <option value="@y" selected>Year @y</option>
+                            }
+                            else
+                            {
+                                <option value="@y">Year @y</option>
+                            }
+                        }
+                </select>
+            </form>
+
+            <a href="/Admin/ExportRevenue?year=@selectedYear" class="btn-export">
+                <i class="fa fa-file-excel-o"></i> Export Report ↗
+            </a>
+        </div>
+    </div>
+
+    <!-- Cards Row -->
+    <div class="summary-grid">
+        <!-- Annual total -->
+        <div class="card-metric primary">
+            <div class="metric-label">Total Annual Revenue</div>
+            <div class="metric-val text-primary">@totalAnnualRevenue.ToString("N0") VND</div>
+            <div class="metric-sub">Paid bookings only</div>
+        </div>
+
+        <!-- Tours -->
+        <div class="card-metric success">
+            <div class="metric-label">Tour Revenue (Paid)</div>
+            <div class="metric-val text-success">@tourRevenue.ToString("N0") VND</div>
+            <div class="metric-sub">Total: <span>@tourCount</span> bookings</div>
+        </div>
+
+        <!-- Hotels -->
+        <div class="card-metric info">
+            <div class="metric-label">Hotel Revenue (Paid)</div>
+            <div class="metric-val text-info">@hotelRevenue.ToString("N0") VND</div>
+            <div class="metric-sub">Total: <span>@hotelCount</span> bookings</div>
+        </div>
+
+        <!-- Pending -->
+        <div class="card-metric warning">
+            <div class="metric-label">Awaiting Payment</div>
+            <div class="metric-val text-warning">@pendingRevenue.ToString("N0") VND</div>
+            <div class="metric-sub">Total: <span style="color:#ef4444;">@pendingCount</span> Unpaid bookings</div>
+        </div>
+    </div>
+
+    <!-- Chart row 1: Stacked Bar + Quarter List -->
+    <div class="chart-layout-grid">
+        <!-- Stacked Bar Monthly -->
+        <div class="chart-card">
+            <div class="chart-title">Monthly Revenue (VND)</div>
+            <div class="chart-subtitle">Tour + Hotel · Paid bookings only</div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quarterly Cards -->
+        <div class="chart-card d-flex flex-column justify-content-between">
+            <div>
+                <div class="chart-title">Quarterly Revenue</div>
+                <div class="chart-subtitle">Revenue distribution by quarter</div>
+            </div>
+            
+            <div class="quarter-list">
+                @for (int i = 0; i < 4; i++)
+                {
+                    decimal qTotal = (tourQuarterly?[i] ?? 0) + (hotelQuarterly?[i] ?? 0);
+                    double qPct = totalAnnualRevenue > 0 ? (double)(qTotal / totalAnnualRevenue * 100) : 0;
+                    <div class="quarter-item">
+                        <div class="quarter-name">Q@(i + 1)</div>
+                        <div class="quarter-val">@qTotal.ToString("N0") VND</div>
+                        <div class="quarter-pct">@qPct.ToString("F1")%</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart row 2: Top Tours Horizontal Bar -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="chart-card">
+                <div class="chart-title">Top Revenue-Generating Tours</div>
+                <div class="chart-subtitle">Top 5 tours with highest paid revenue</div>
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="topToursChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Prepare monthly data
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const tourData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(tourMonthly));
+    const hotelData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(hotelMonthly));
+
+    // Monthly Stacked Chart
+    const ctxMonthly = document.getElementById('monthlyChart').getContext('2d');
+    new Chart(ctxMonthly, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Tour',
+                    data: tourData,
+                    backgroundColor: '#6366f1',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Hotel',
+                    data: hotelData,
+                    backgroundColor: '#14b8a6',
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: { display: false }
+                },
+                y: {
+                    stacked: true,
+                    ticks: {
+                        callback: function(value) {
+                            if (value >= 1e9) return (value / 1e9).toFixed(1) + ' tỷ';
+                            if (value >= 1e6) return (value / 1e6).toFixed(0) + ' tr';
+                            return value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            }
+        }
+    });
+
+    // Top Tours Chart Data
+    @{
+        var topTourLabels = new List<string>();
+        var topTourValues = new List<decimal>();
+        if (topTours != null)
+        {
+            foreach (var t in topTours)
+            {
+                // Accessing anonymous object properties in Razor dynamically
+                var title = t.GetType().GetProperty("TourTitle").GetValue(t, null) as string ?? "";
+                var rev = (decimal)t.GetType().GetProperty("Revenue").GetValue(t, null);
+                topTourLabels.Add(title);
+                topTourValues.Add(rev);
+            }
+        }
+        string labelsJson = System.Text.Json.JsonSerializer.Serialize(topTourLabels);
+        string valuesJson = System.Text.Json.JsonSerializer.Serialize(topTourValues);
+    }
+
+    const topToursLabels = @Html.Raw(labelsJson);
+    const topToursValues = @Html.Raw(valuesJson);
+
+    const ctxTopTours = document.getElementById('topToursChart').getContext('2d');
+    new Chart(ctxTopTours, {
+        type: 'bar',
+        data: {
+            labels: topToursLabels,
+            datasets: [
+                {
+                    label: 'Revenue (VND)',
+                    data: topToursValues,
+                    backgroundColor: '#818cf8',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    ticks: {
+                        callback: function(value) {
+                            if (value >= 1e9) return (value / 1e9).toFixed(1) + 'B';
+                            if (value >= 1e6) return (value / 1e6).toFixed(0) + 'M';
+                            return value;
+                        }
+                    }
+                },
+                y: {
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
